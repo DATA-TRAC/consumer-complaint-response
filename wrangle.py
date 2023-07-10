@@ -24,23 +24,23 @@ print(f'imports loaded successfully, awaiting commands...')
 
 #------------------------------------------------------------- ACQUIRE -------------------------------------------------------------
     
-def check_file_exists_gbq(fn):
+def check_file_exists_gbq(csv_fn, json_fn):
     '''
     check if file exists in my local directory, if not, pull from google big query db
     using service key token, return dataframe and save to a csv in the local directory
     '''
     #credentials
     credentials = service_account.Credentials.from_service_account_file(
-    'service_key.json',)
+    json_fn,)
     
     #if/else file exists in local directory
-    if os.path.isfile(fn):
+    if os.path.isfile(csv_fn):
         print('csv file found and loaded')
-        return pd.read_csv(fn, index_col=0)
+        return pd.read_csv(csv_fn, index_col=0)
     else: 
         print('creating df and exporting csv')
         df = pandas_gbq.read_gbq("select * from cfpb_complaints.complaint_database",dialect='standard',project_id="my-ds-projects",use_bqstorage_api=True,credentials=credentials)
-        df.to_csv(fn)
+        df.to_csv(csv_fn)
         return df
     
 #------------------------------------------------------------- PREPARE -------------------------------------------------------------
