@@ -2,41 +2,112 @@
 
 ## Project Description
 
-* This repo contains a project ___Using analysis and data aggregating techniques we were able to answer the questions listed below___ The deliverables are ___
+* This project aims to predict a company's response to a complaint made by a consumer to the Consumer Financial Protection Bureau to see if the wording of a complaint can give a better or worse response from the company.
 
 ## Project Goal
 
-* This analysis aims to address the listed questions and uncover any additional important findings related to the data.
+* This analysis aims to provide an accurate prediction of company response based on the language of a complaint.
 
 ### Initial Thoughts
 
-* There are going to be valuable insights that we can use  to ___
+* There are going to be key words that match to a companies response.
 
 ## The Plan
 
-* Acquire
+### Acquire
 
   * Data acquired from [Google BigQuery](https://console.cloud.google.com/marketplace/product/cfpb/complaint-database)
-  * Joined ___created a CSV___
   * 3458906 rows × 18 columns *before* cleaning
-  * ___ rows × __ columns *after* cleaning
   
-* Prepare
+### Prepare
 
-  * dropped columns
-    * insert
-  * renamed columns
-    * insert
-    * insert
-    * insert
-  * changed dates to datetime type
-  * created new columns
-    * insert
-    * insert
-    * insert
-    * insert
-  * no nulls
-* Explore
+* date_receieved 
+    * changed date to datetime
+    * no nulls
+    * 2011 to 2023
+* product 
+    * no nulls
+    * credit related
+        * **bin related services together**
+* subproduct
+    * 7% null
+    * top value = credit reporting
+    * fill nulls with the product
+    * what does subproduct correlate with?
+        * **drop entirely for the MVP**
+* issue
+    * no nulls
+    * 165 unique values
+    * concat into consumer_complaint_narrative column to address those nulls and then drop issue
+        * **issue, subissue, and narrative are all consumer entered items so we are not risking unethical manipulation of the data because the source is the consumer**
+* subissue
+    * 20% null
+    * 221 unique
+        * **concat and drop with issue INTO narrative**
+* consumer_complaint_narrative (ENGINEERED FEATURE)
+    * 64% null before imputing above values
+        * narrative_plus_issue
+            * **AFTER concat = 0% null
+* company_public_response
+    * 56% null
+        * **drop company_public_response because it doesn't relate to the target or even features**
+* company_name
+    * no nulls
+    * 6,694 companies
+        * **16 SVB complaints -- *can possibly add as an end project application/impact to identify fraudlent activity or discrimination based on customer complaints***
+        * **SPICY**
+* state
+    * 1% null
+    * based on per capita, population, and state size... 
+    * keep for purposes of exploration
+    * do not bin (causes manipulation)
+        * **bin 1% null into UNKNOWN labeling**
+* zip code
+    * 1% null
+    * located a string buried in the data
+        * **use re to clean**
+        * **drop for MVP, nice-to-have for second iteration looking at discrimination**
+* tags
+    * 89% null
+    * domain knowledge: 62 and older accounted for senior - pulled straight from source
+        * **impute nulls with "Average Person**
+* consumer_consent_provided
+    * does not relate to target
+        * **drop**
+* submitted_via
+    * no nulls
+        * **drop because imbalanced data, doesn't provide enough value for target**
+* date_sent_to_company
+    * no nulls
+        * **drop because no value and we also dropped submitted_via which includes mail, fax, etc...**
+* company_response_to_consumer
+    * 4 nulls = 0%
+        * **drop these 4 rows because this is the target column**
+    * 8 unique values
+        * **investigate the difference between closed without relief and closed with relief**
+        * **NICE_TO_HAVE: applying model to in_progess complaints and see what it predicts based on the language**
+    * 7 unique values after dropping 'in_progress'
+* timely_response
+    * no nulls
+    * boolean
+        * **drop because it is noise, no value to target**
+* consumer_disputed
+    * 77% null
+        * **drop because this data has a lot of nulls**
+* complaint_id
+    * no nulls
+        * **drop, not valuable for MVP. Can be used for nice_to_haves**
+
+---
+
+**Post Univariate Inspection**
+
+* 3355342 rows x 7 columns *after* cleaning
+    * date_recieved, product, narrative_plus_issue, compnay_name, state, tags, company_response_to_customer (target)
+
+---
+
+### Explore
 
   * Questions
     1.
