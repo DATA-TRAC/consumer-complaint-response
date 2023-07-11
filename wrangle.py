@@ -186,11 +186,12 @@ def clean(text):
 
 #------------------------------------------------------------- NLTK -------------------------------------------------------------
 
-# Initialize the sentiment intensity analyzer
-sia = SentimentIntensityAnalyzer()
+def sentiment_analysis(df):
+    '''
+    this function applies NLTK sentiment ananlysis to each narrative in the df
+    '''
+    # Initialize the sentiment intensity analyzer
+    sia = SentimentIntensityAnalyzer()
 
-# Replace None with '' (empty string)
-df['consumer_complaint_narrative'] = df['consumer_complaint_narrative'].fillna('')
-
-# Apply the sentiment intensity analyzer to the 'consumer_complaint_narrative' column
-df['sentiment'] = df['consumer_complaint_narrative'].apply(lambda complaint: sia.polarity_scores(complaint))
+    # Apply the sentiment intensity analyzer to the 'consumer_complaint_narrative' column
+    df['sentiment'] = df['narrative'].apply(lambda complaint: sia.polarity_scores(complaint))
