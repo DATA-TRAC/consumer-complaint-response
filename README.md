@@ -107,7 +107,7 @@
 
 ### Post Cleaning Inspection
 
-* 1246736 rows x 8 columns
+* 1246736 rows x 7 columns
   * date_received, product_bins, narrative, company_name, state, tags, company_response_to_customer (target)
 
 ---
