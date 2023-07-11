@@ -119,7 +119,8 @@
     * Do specific issues tend to receive specific responses? For example, do issues related to fraud tend to receive more "closed with relief" responses compared to other issues?
     * Which company has received the most negative sentiment in its narrative?
     * Which company has had the most negative response towards consumer, such as being closed without relief, closed with no monetary relief, etc.?
-
+    * Are service members rewarded the most with closed with monetary relief/relief?
+    
 ## Data Dictionary
 
 | Feature                               | Definition                                                                                  |
