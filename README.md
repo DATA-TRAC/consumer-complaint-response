@@ -10,110 +10,113 @@
 
 ### Initial Thoughts
 
-* There are going to be key words that match to a companies response.
+* There are going to be key words that match to a companies response
+* Sentiment analysis will not be useful because most complaints will likely be negative
 
 ## The Plan
 
 ### Acquire
 
-  * Data acquired from [Google BigQuery](https://console.cloud.google.com/marketplace/product/cfpb/complaint-database)
-  * 3458906 rows × 18 columns *before* cleaning
-  
+* Data acquired from [Google BigQuery](https://console.cloud.google.com/marketplace/product/cfpb/complaint-database)
+* 3458906 rows × 18 columns *before* cleaning
+
 ### Prepare
 
-* date_receieved 
-    * changed date to datetime
-    * no nulls
-    * 2011 to 2023
-* product 
-    * no nulls
-    * credit related
-        * **bin related services together**
+* date_received
+  * changed date to datetime
+  * no nulls
+  * 2011 to 2023
+* product
+  * no nulls
+  * credit related
+    * **bin related services together**
 * subproduct
-    * 7% null
-    * top value = credit reporting
-    * fill nulls with the product
-    * what does subproduct correlate with?
-        * **drop entirely for the MVP**
+  * 7% null
+  * top value = credit reporting
+  * fill nulls with the product
+  * what does subproduct correlate with?
+    * **drop entirely for the MVP**
 * issue
-    * no nulls
-    * 165 unique values
-    * concat into consumer_complaint_narrative column to address those nulls and then drop issue
-        * **issue, subissue, and narrative are all consumer entered items so we are not risking unethical manipulation of the data because the source is the consumer**
+  * no nulls
+  * 165 unique values
+  * concat into consumer_complaint_narrative column to address those nulls and then drop issue
+    * **issue, subissue, and narrative are all consumer entered items so we are not risking unethical manipulation of the data because the source is the consumer**
 * subissue
-    * 20% null
-    * 221 unique
-        * **concat and drop with issue INTO narrative**
+  * 20% null
+  * 221 unique
+    * **concat and drop with issue INTO narrative**
 * consumer_complaint_narrative (ENGINEERED FEATURE)
-    * 64% null before imputing above values
-        * narrative_plus_issue
-            * **AFTER concat = 0% null
+  * 64% null before imputing above values
+    * narrative_plus_issue
+      * **AFTER concat = 0% null
 * company_public_response
-    * 56% null
-        * **drop company_public_response because it doesn't relate to the target or even features**
+  * 56% null
+    * **drop company_public_response because it doesn't relate to the target or even features**
 * company_name
-    * no nulls
-    * 6,694 companies
-        * **16 SVB complaints -- *can possibly add as an end project application/impact to identify fraudlent activity or discrimination based on customer complaints***
-        * **SPICY**
+  * no nulls
+  * 6,694 companies
+    * **16 SVB complaints -- *can possibly add as an end project application/impact to identify fraudulent activity or discrimination based on customer complaints***
+    * **SPICY**
 * state
-    * 1% null
-    * based on per capita, population, and state size... 
-    * keep for purposes of exploration
-    * do not bin (causes manipulation)
-        * **bin 1% null into UNKNOWN labeling**
+  * 1% null
+  * based on per capita, population, and state size...
+  * keep for purposes of exploration
+  * do not bin (causes manipulation)
+    * **bin 1% null into UNKNOWN labeling**
 * zip code
-    * 1% null
-    * located a string buried in the data
-        * **use re to clean**
-        * **drop for MVP, nice-to-have for second iteration looking at discrimination**
+  * 1% null
+  * located a string buried in the data
+    * **use re to clean**
+    * **drop for MVP, nice-to-have for second iteration looking at discrimination**
 * tags
-    * 89% null
-    * domain knowledge: 62 and older accounted for senior - pulled straight from source
-        * **impute nulls with "Average Person**
+  * 89% null
+  * domain knowledge: 62 and older accounted for senior - pulled straight from source
+    * **impute nulls with "Average Person**
 * consumer_consent_provided
-    * does not relate to target
-        * **drop**
+  * does not relate to target
+    * **drop**
 * submitted_via
-    * no nulls
-        * **drop because imbalanced data, doesn't provide enough value for target**
+  * no nulls
+    * **drop because imbalanced data, doesn't provide enough value for target**
 * date_sent_to_company
-    * no nulls
-        * **drop because no value and we also dropped submitted_via which includes mail, fax, etc...**
+  * no nulls
+    * **drop because no value and we also dropped submitted_via which includes mail, fax, etc...**
 * company_response_to_consumer
-    * 4 nulls = 0%
-        * **drop these 4 rows because this is the target column**
-    * 8 unique values
-        * **investigate the difference between closed without relief and closed with relief**
-        * **NICE_TO_HAVE: applying model to in_progess complaints and see what it predicts based on the language**
-    * 7 unique values after dropping 'in_progress'
+  * 4 nulls = 0%
+    * **drop these 4 rows because this is the target column**
+  * 8 unique values
+    * **investigate the difference between closed without relief and closed with relief**
+    * **NICE_TO_HAVE: applying model to in_progress complaints and see what it predicts based on the language**
+  * 7 unique values after dropping 'in_progress'
 * timely_response
-    * no nulls
-    * boolean
-        * **drop because it is noise, no value to target**
+  * no nulls
+  * boolean
+    * **drop because it is noise, no value to target**
 * consumer_disputed
-    * 77% null
-        * **drop because this data has a lot of nulls**
+  * 77% null
+    * **drop because this data has a lot of nulls**
 * complaint_id
-    * no nulls
-        * **drop, not valuable for MVP. Can be used for nice_to_haves**
+  * no nulls
+    * **drop, not valuable for MVP. Can be used for nice_to_haves**
 
 ---
 
-**Post Univariate Inspection**
+### Post Univariate Inspection
 
 * 3355342 rows x 7 columns *after* cleaning
-    * date_recieved, product, narrative_plus_issue, compnay_name, state, tags, company_response_to_customer (target)
+  * date_received, product, narrative_plus_issue, company_name, state, tags, company_response_to_customer (target)
 
 ---
 
 ### Explore
 
-  * Questions
-    1.
-    2.
-    3.
-    4.
+* Questions
+
+  * Narratives with a highly negative sentiment analysis will lead to a response of closed or closed without monetary relief.
+  * Narratives with a short narrative length will lead to a response of closed with explanation.
+  * Narratives with a neutral or positive sentiment analysis relating to bank account or service or checking or savings account will lead to a response of closed with monetary relief.
+  * Do different states use different language when complaining?
+  * Do specific issues tend to receive specific responses? For example, do issues related to fraud tend to receive more "closed with relief" responses compared to other issues?
 
 ## Data Dictionary
 
@@ -142,7 +145,7 @@
 ## Steps to Reproduce
 
 1) Clone this repo
-   *  You may need to update your Python Libraries, my libraries were updated on 5 June, 2023 for this project
+   * You may need to update your Python Libraries, my libraries were updated on 5 June, 2023 for this project
 2) For a quick run
    * Verify `import wrangle as w` is in the imports section of final_notebook
    * Run final_notebook
