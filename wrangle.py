@@ -63,10 +63,13 @@ def clean_data(df):
     """
     # Change column type to datetime64[ns] for column: 'date_received'
     df = df.astype({'date_received': 'datetime64[ns]'})
-    # Derive column 'narrative' from columns: 'consumer_complaint_narrative', 'issue', 'subissue'
-    df.insert(5,'narrative',df.apply(
-            lambda row: f'{str(row.issue)} {str(row.subissue)} {str(row.consumer_complaint_narrative)}',
-            axis=1,),)
+    # Drop nulls based on column: 'consumer_complaint_narrative'
+    df = df[df['consumer_complaint_narrative'].notna()]
+    # not used anymore
+    # # Derive column 'narrative' from columns: 'consumer_complaint_narrative', 'issue', 'subissue'
+    # df.insert(5,'narrative',df.apply(
+    #         lambda row: f'{str(row.issue)} {str(row.subissue)} {str(row.consumer_complaint_narrative)}',
+    #         axis=1,),)
     # Replace missing values with "UNKNOWN" in column: 'state' and "Average Person" in column: 'tags'
     df = df.fillna({'state': "UNKNOWN",'tags': "Average Person"})
     # Drop rows with missing data in column: 'company_response_to_consumer'
@@ -74,7 +77,7 @@ def clean_data(df):
     # Filter rows based on column: 'company_response_to_consumer'
     df = df[df['company_response_to_consumer'] != "In progress"]
     # drop columns not used for explore or modeling
-    return df.drop(
+    df = df.drop(
         columns=[
             'subproduct',
             'complaint_id',
@@ -87,9 +90,9 @@ def clean_data(df):
             'consumer_consent_provided',
             'issue',
             'subissue',
-            'consumer_complaint_narrative',
         ]
     )
+    return df.rename(columns={'consumer_complaint_narrative':'narrative'})
 
 def lower_everything(string):
     return string.str.lower()
