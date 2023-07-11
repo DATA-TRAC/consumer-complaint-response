@@ -42,7 +42,44 @@ def check_file_exists_gbq(csv_fn, json_fn):
     
 #------------------------------------------------------------- PREPARE -------------------------------------------------------------
 
-
+def clean_data(df):
+    """
+    The `clean_data` function takes a DataFrame as input, performs various data cleaning operations such
+    as changing column types, deriving a new column, replacing missing values, dropping rows, and
+    dropping unnecessary columns, and returns the cleaned DataFrame.
+    
+    :param df: The parameter `df` is a pandas DataFrame that contains the data to be cleaned
+    :return: a cleaned dataframe with certain columns dropped and missing values replaced.
+    """
+    # Change column type to datetime64[ns] for column: 'date_received'
+    df = df.astype({'date_received': 'datetime64[ns]'})
+    # Derive column 'narrative' from columns: 'consumer_complaint_narrative', 'issue', 'subissue'
+    df.insert(5,'narrative',df.apply(
+            lambda row: f'{str(row.issue)} {str(row.subissue)} {str(row.consumer_complaint_narrative)}',
+            axis=1,),)
+    # Replace missing values with "UNKNOWN" in column: 'state' and "Average Person" in column: 'tags'
+    df = df.fillna({'state': "UNKNOWN",'tags': "Average Person"})
+    # Drop rows with missing data in column: 'company_response_to_consumer'
+    df = df.dropna(subset=['company_response_to_consumer'])
+    # Filter rows based on column: 'company_response_to_consumer'
+    df = df[df['company_response_to_consumer'] != "In progress"]
+    # drop columns not used for explore or modeling
+    return df.drop(
+        columns=[
+            'subproduct',
+            'complaint_id',
+            'consumer_disputed',
+            'timely_response',
+            'date_sent_to_company',
+            'submitted_via',
+            'company_public_response',
+            'zip_code',
+            'consumer_consent_provided',
+            'issue',
+            'subissue',
+            'consumer_complaint_narrative',
+        ]
+    )
 
 #------------------------------------------------------------- VIZZES -------------------------------------------------------------
 
