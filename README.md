@@ -119,6 +119,7 @@
 4. Are there unique words associated with the most negative and most positive company response?
 5. Is there a relationship/bias for servicemember tags in relation to company response?
 6. Does narrative length relate to company response?
+7. What are the payout words that got a company response of closed with monetary relief?
     
 ## Data Dictionary
 
