@@ -220,4 +220,11 @@ def split_data(df,variable):
     train, test = train_test_split(df,
                                     random_state=123, test_size=.20, stratify= df[variable])
     train, validate = train_test_split(train, random_state=123, test_size=.25, stratify= train[variable])
+    
+    #returns shapes of df's
+    print(f'Prepared DF: {df.shape}')
+    print(f'Train: {train.shape}')
+    print(f'Validate: {validate.shape}')
+    print(f'Test: {test.shape}')
+    
     return train, validate, test
