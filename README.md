@@ -29,29 +29,29 @@
 * product
   * no nulls
   * credit related
-    * **bin related services together**
+    * **bin related products/services together**
 * subproduct
   * 7% null
   * top value = credit reporting
   * fill nulls with the product
   * what does subproduct correlate with?
-    * **drop entirely for the MVP**
+    * **drop column**
 * issue
   * no nulls
   * 165 unique values
   * concat into consumer_complaint_narrative column to address those nulls and then drop issue
-    * **issue, subissue, and narrative are all consumer entered items so we are not risking unethical manipulation of the data because the source is the consumer**
+    * **drop column**
 * subissue
   * 20% null
   * 221 unique
-    * **concat and drop with issue INTO narrative**
-* consumer_complaint_narrative (ENGINEERED FEATURE)
-  * 64% null before imputing above values
-    * narrative_plus_issue
-      * **AFTER concat = 0% null
+    * **drop column**
+* consumer_complaint_narrative
+  * 64% null
+  * renamed to narrative
+     * **drop null values**
 * company_public_response
   * 56% null
-    * **drop company_public_response because it doesn't relate to the target or even features**
+    * **drop column**
 * company_name
   * no nulls
   * 6,694 companies
@@ -67,44 +67,45 @@
   * 1% null
   * located a string buried in the data
     * **use re to clean**
-    * **drop for MVP, nice-to-have for second iteration looking at discrimination**
+    * **drop for MVP: nice-to-have for second iteration**
 * tags
   * 89% null
   * domain knowledge: 62 and older accounted for senior - pulled straight from source
     * **impute nulls with "Average Person**
 * consumer_consent_provided
   * does not relate to target
-    * **drop**
+    * **drop column**
 * submitted_via
   * no nulls
-    * **drop because imbalanced data, doesn't provide enough value for target**
+    * **drop column**
 * date_sent_to_company
   * no nulls
-    * **drop because no value and we also dropped submitted_via which includes mail, fax, etc...**
+    * **drop column**
 * company_response_to_consumer
   * 4 nulls = 0%
     * **drop these 4 rows because this is the target column**
   * 8 unique values
     * **investigate the difference between closed without relief and closed with relief**
     * **NICE_TO_HAVE: applying model to in_progress complaints and see what it predicts based on the language**
-  * 7 unique values after dropping 'in_progress'
+    * **drop 'in progress' response because there is no conclusion**
+  * 7 unique values
 * timely_response
   * no nulls
   * boolean
-    * **drop because it is noise, no value to target**
+    * **drop column**
 * consumer_disputed
   * 77% null
-    * **drop because this data has a lot of nulls**
+    * **drop column**
 * complaint_id
   * no nulls
-    * **drop, not valuable for MVP. Can be used for nice_to_haves**
+    * **drop for MVP: nice-to-have for second iteration**
 
 ---
 
 ### Post Univariate Inspection
 
-* 3355342 rows x 7 columns *after* cleaning
-  * date_received, product, narrative_plus_issue, company_name, state, tags, company_response_to_customer (target)
+* 1246736 rows x 7 columns *after* cleaning
+  * date_received, product, narrative, company_name, state, tags, company_response_to_customer (target)
 
 ---
 
@@ -112,14 +113,12 @@
 
 * Questions
 
-    * Narratives with a highly negative sentiment analysis will lead to a response of closed or closed without monetary relief.
-    * Narratives with a short narrative length will lead to a response of closed with explanation.
-    * Narratives with a neutral or positive sentiment analysis relating to bank account or service or checking or savings account will lead to a response of closed with monetary relief.
-    * Do different states use different language when complaining?
-    * Do specific issues tend to receive specific responses? For example, do issues related to fraud tend to receive more "closed with relief" responses compared to other issues?
-    * Which company has received the most negative sentiment in its narrative?
-    * Which company has had the most negative response towards consumer, such as being closed without relief, closed with no monetary relief, etc.?
-    * Are service members rewarded the most with closed with monetary relief/relief?
+1. Do specific issues tend to receive specific responses? For example, do issues related to fraud tend to receive more "closed with relief" responses compared to other issues?
+2. Is there a relationship between consumer complaint and company response?
+3. Do narratives with a neutral or positive sentiment analysis relating to bank account products lead to a response of closed with monetary relief?
+4. Are there unique words associated with the most negative and most positive company response?
+5. Is there a relationship/bias for servicemember tags in relation to company response?
+6. Does narrative length relate to company response?
     
 ## Data Dictionary
 
@@ -177,6 +176,5 @@
 
 ## Recommendations/Next Steps
 
-* insert
-* insert
-* insert
+* Nice-To-Haves: Second iteration looking at discrimination based on zip code/state and company response, applying model to in_progress complaints and see what it predicts based on the language after company response
+
