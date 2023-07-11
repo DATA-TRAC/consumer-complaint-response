@@ -25,7 +25,7 @@
 * date_received
   * changed date to datetime
   * no nulls
-  * 2011 to 2023
+  * 2015 to 2023
 * product
   * no nulls
   * credit related
