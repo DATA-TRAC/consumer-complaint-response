@@ -35,7 +35,7 @@ def check_file_exists_gbq(csv_fn, json_fn):
     '''
     #credentials
     credentials = service_account.Credentials.from_service_account_file(
-    [json_fn],)
+    json_fn,)
     
     #if/else file exists in local directory
     if os.path.isfile(csv_fn):
