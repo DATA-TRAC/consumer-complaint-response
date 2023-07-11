@@ -112,11 +112,13 @@
 
 * Questions
 
-  * Narratives with a highly negative sentiment analysis will lead to a response of closed or closed without monetary relief.
-  * Narratives with a short narrative length will lead to a response of closed with explanation.
-  * Narratives with a neutral or positive sentiment analysis relating to bank account or service or checking or savings account will lead to a response of closed with monetary relief.
-  * Do different states use different language when complaining?
-  * Do specific issues tend to receive specific responses? For example, do issues related to fraud tend to receive more "closed with relief" responses compared to other issues?
+    * Narratives with a highly negative sentiment analysis will lead to a response of closed or closed without monetary relief.
+    * Narratives with a short narrative length will lead to a response of closed with explanation.
+    * Narratives with a neutral or positive sentiment analysis relating to bank account or service or checking or savings account will lead to a response of closed with monetary relief.
+    * Do different states use different language when complaining?
+    * Do specific issues tend to receive specific responses? For example, do issues related to fraud tend to receive more "closed with relief" responses compared to other issues?
+    * Which company has received the most negative sentiment in its narrative?
+    * Which company has had the most negative response towards consumer, such as being closed without relief, closed with no monetary relief, etc.?
 
 ## Data Dictionary
 
