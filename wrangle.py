@@ -1,5 +1,6 @@
 #standard imports
 import pandas as pd 
+import numpy as np
 
 #get/create files
 import os
@@ -76,6 +77,22 @@ def clean_data(df):
     df = df.dropna(subset=['company_response_to_consumer'])
     # Filter rows based on column: 'company_response_to_consumer'
     df = df[df['company_response_to_consumer'] != "In progress"]
+    # bin products into lists
+    credit_report = ['Credit reporting, credit repair services, or other personal consumer reports', 'Credit reporting']
+    credit_card = ['Credit card or prepaid card', 'Prepaid card', 'Credit card']
+    debt_collection = ['Debt collection']
+    mortgage = ['Mortgage']
+    bank = ['Bank account or service', 'Checking or savings account']
+    loans = ['Consumer Loan', 'Payday loan', 'Payday loan, title loan, or personal loan', 'Student loan', 'Vehicle loan or lease']
+    money_service = ['Money transfer, virtual currency, or money service', 'Money transfers', 'Other financial service', 'Virtual currency']
+    # make new binned product column
+    df['product_bins'] = np.where(df['product'].isin(credit_report),'credit_report','')
+    df['product_bins'] = np.where(df['product'].isin(credit_card),'credit_card',df['product_bins'])
+    df['product_bins'] = np.where(df['product'].isin(debt_collection),'debt_collection',df['product_bins'])
+    df['product_bins'] = np.where(df['product'].isin(mortgage),'mortgage',df['product_bins'])
+    df['product_bins'] = np.where(df['product'].isin(bank),'bank',df['product_bins'])
+    df['product_bins'] = np.where(df['product'].isin(loans),'loans',df['product_bins'])
+    df['product_bins'] = np.where(df['product'].isin(money_service),'money_service',df['product_bins'])
     # drop columns not used for explore or modeling
     df = df.drop(
         columns=[
@@ -90,6 +107,7 @@ def clean_data(df):
             'consumer_consent_provided',
             'issue',
             'subissue',
+            'product'
         ]
     )
     return df.rename(columns={'consumer_complaint_narrative':'narrative'})
