@@ -125,23 +125,27 @@ def lemmad(string):
     string = ' '.join(string)
     return string
 
-def remove_stopwords(string, extra_words=[], exclude_words=[]):
+def remove_stopwords(string, extra_words=None, exclude_words=None):
+    if extra_words is None:
+        extra_words = []
+    if exclude_words is None:
+        exclude_words = []
     sls = stopwords.words('english')
-    
+
     sls = set(sls) - set(exclude_words)
     sls = sls.union(set(extra_words))
-    
+
     words = string.split()
     filtered = [word for word in words if word not in sls]
     string = ' '.join(filtered)
     return string
 
-def clean_df(df, exclude_words=[], extra_words=[]):
+def clean_df(df, exclude_words, extra_words):
     '''
     send in df with columns: title and original,
     returns df with original, clean, stemmed, and lemmatized data
     '''
-    df['clean'] = df.original.apply(basic_clean).apply(token_it_up).apply(remove_stopwords)
+    df['clean'] = df.original.apply(basic_clean).apply(token_it_up).apply(remove_stopwords(exclude_words=exclude_words, extra_words=extra_words))
     df['stem'] = df.clean.apply(stemmer)
     df['lemma'] = df.clean.apply(lemmad)
     
@@ -159,39 +163,48 @@ def clean(text):
         list: A list of lemmatized words after cleaning.
     '''
     #assigning additional stopwords
-    ADDITIONAL_STOPWORDS = ['r', 'u', '2', '4', 'ltgt']
-    
+    ADDITIONAL_STOPWORDS = ['r', 'u', '2', '4']
+
     # basic_clean() function from last lesson:
     # Normalize text by removing diacritics, encoding to ASCII, decoding to UTF-8, and converting to lowercase
     text = (unicodedata.normalize('NFKD', text)
-             .encode('ascii', 'ignore')
-             .decode('utf-8', 'ignore') #most frequently used for base text creation - works great with SQL
-             .lower())
-    
+            .encode('ascii', 'ignore')
+            .decode('utf-8', 'ignore') #most frequently used for base text creation - works great with SQL
+            .lower())
+
     # Remove punctuation, split text into words
     words = re.sub(r'[^\w\s]', '', text).split()
-    
-    
+
+
     # lemmatize() function from last lesson:
     # Initialize WordNet lemmatizer
     wnl = nltk.stem.WordNetLemmatizer()
-    
+
     # Combine standard English stopwords with additional stopwords
     stopwords = nltk.corpus.stopwords.words('english') + ADDITIONAL_STOPWORDS
-    
-    # Lemmatize words and remove stopwords
-    cleaned_words = [wnl.lemmatize(word) for word in words if word not in stopwords]
-    
-    return cleaned_words
+
+    return [wnl.lemmatize(word) for word in words if word not in stopwords]
 
 #------------------------------------------------------------- NLTK -------------------------------------------------------------
 
 def sentiment_analysis(df):
     '''
-    this function applies NLTK sentiment ananlysis to each narrative in the df
+    this function applies NLTK sentiment analysis to each narrative in the df
     '''
     # Initialize the sentiment intensity analyzer
     sia = SentimentIntensityAnalyzer()
 
     # Apply the sentiment intensity analyzer to the 'consumer_complaint_narrative' column
     df['sentiment'] = df['narrative'].apply(lambda complaint: sia.polarity_scores(complaint))
+
+#------------------------------------------------------------- SPLIT ------------------------------------------------------------
+
+def split_data(df,variable):
+    """
+    This function helps divide the data into train, validate, and testing
+    while stratifying on a target"
+    """
+    train, test = train_test_split(df,
+                                    random_state=123, test_size=.20, stratify= df[variable])
+    train, validate = train_test_split(train, random_state=123, test_size=.25, stratify= train[variable])
+    return train, validate, test
