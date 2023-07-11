@@ -110,43 +110,64 @@ def clean_data(df):
             'product'
         ]
     )
+    df = df.reset_index().drop(columns='index')
     return df.rename(columns={'consumer_complaint_narrative':'narrative'})
 
-def lower_everything(string):
-    return string.str.lower()
-
-def normalize_everything(string):
-    string = unicodedata.normalize('NFKD', string).encode('ascii','ignore').decode('utf-8')
-    return string
-
-def specials_removed(string):
-    string = re.sub(r'[^a-z0-9\'\s]', '', string)
-    return string
-
 def basic_clean(string):
+    """
+    The function `basic_clean` takes a string as input and performs basic cleaning operations such as
+    converting the string to lowercase, removing non-alphanumeric characters, and normalizing unicode
+    characters.
+    
+    :param string: The parameter "string" is a string that you want to perform basic cleaning on
+    :return: The function `basic_clean` returns a cleaned version of the input string.
+    """
     string = string.lower()
     string = unicodedata.normalize('NFKD', string).encode('ascii','ignore').decode('utf-8')
     string = re.sub(r'[^a-z0-9\'\s]', '', string)
     return string
 
 def token_it_up(string):
+    """
+    The function `token_it_up` takes a string as input and uses the `ToktokTokenizer` from the
+    `nltk.tokenize` module to tokenize the string into individual words, returning the tokenized string.
+    
+    :param string: The input string that you want to tokenize
+    :return: a tokenized version of the input string.
+    """
     tokenize = nltk.tokenize.ToktokTokenizer()
     string = tokenize.tokenize(string, return_str=True)
     return string
 
-def stemmer(string):
-    ps = nltk.porter.PorterStemmer()
-    stems = [ps.stem(word) for word in string.split()]
-    string = ' '.join(stems)
-    return string
-
 def lemmad(string):
+    """
+    The function `lemmad` takes a string as input, splits it into individual words, applies
+    lemmatization to each word using WordNetLemmatizer from the nltk library, and then joins the
+    lemmatized words back into a string.
+    
+    :param string: The parameter "string" is a string of text that you want to lemmatize
+    :return: The function `lemmad` returns a string where each word has been lemmatized using the
+    WordNetLemmatizer from the NLTK library.
+    """
     wnl = nltk.stem.WordNetLemmatizer()
     string = [wnl.lemmatize(word) for word in string.split()]
     string = ' '.join(string)
     return string
 
 def remove_stopwords(string, extra_words=None, exclude_words=None):
+    """
+    The function `remove_stopwords` takes a string as input and removes common English stopwords from
+    it, along with any extra words specified by the user and excluding any words specified by the user.
+    
+    :param string: The input string from which you want to remove stopwords. Stopwords are commonly used
+    words in a language that are often considered insignificant and are typically removed from text data
+    during natural language processing tasks
+    :param extra_words: A list of additional words that you want to include in the stopwords list. These
+    words will not be removed from the string
+    :param exclude_words: A list of words that should be excluded from the stopwords list. These words
+    will not be removed from the input string
+    :return: a string with the stopwords removed.
+    """
     if extra_words is None:
         extra_words = []
     if exclude_words is None:
@@ -161,50 +182,21 @@ def remove_stopwords(string, extra_words=None, exclude_words=None):
     string = ' '.join(filtered)
     return string
 
-def clean_df(df, exclude_words, extra_words):
-    '''
-    send in df with columns: title and original,
-    returns df with original, clean, stemmed, and lemmatized data
-    '''
-    df['clean'] = df.original.apply(basic_clean).apply(token_it_up).apply(remove_stopwords(exclude_words=exclude_words, extra_words=extra_words))
-    df['stem'] = df.clean.apply(stemmer)
-    df['lemma'] = df.clean.apply(lemmad)
+def prep_narrative(df):
+    """
+    The function `prep_narrative` takes a DataFrame as input, performs several data cleaning and
+    preprocessing steps on the 'narrative' column, and returns the modified DataFrame.
     
+    :param df: The parameter `df` is a pandas DataFrame that contains a column named 'narrative'
+    :return: the prepped dataframe (df) with additional columns: 'no_x', 'clean', and 'lemon'.
+    """
+    df = df.assign(no_x = df.apply(lambda row : re.sub(r'[X{1,}\d\']', '', row.narrative), axis=1))
+    # Derive column 'clean' from column: cleanup up 'readme_contents'
+    df = df.assign(clean = df.apply(lambda row : remove_stopwords(token_it_up(basic_clean(row.no_x))), axis=1))
+    # Derive column 'lemmatized' from column: lemmatized 'clean'
+    df = df.assign(lemon = df.apply(lambda row : lemmad(row.clean), axis=1))
+    # return prepped df
     return df
-
-
-def clean(text):
-    '''
-    A simple function to cleanup text data.
-    
-    Args:
-        text (str): The text to be cleaned.
-        
-    Returns:
-        list: A list of lemmatized words after cleaning.
-    '''
-    #assigning additional stopwords
-    ADDITIONAL_STOPWORDS = ['r', 'u', '2', '4']
-
-    # basic_clean() function from last lesson:
-    # Normalize text by removing diacritics, encoding to ASCII, decoding to UTF-8, and converting to lowercase
-    text = (unicodedata.normalize('NFKD', text)
-            .encode('ascii', 'ignore')
-            .decode('utf-8', 'ignore') #most frequently used for base text creation - works great with SQL
-            .lower())
-
-    # Remove punctuation, split text into words
-    words = re.sub(r'[^\w\s]', '', text).split()
-
-
-    # lemmatize() function from last lesson:
-    # Initialize WordNet lemmatizer
-    wnl = nltk.stem.WordNetLemmatizer()
-
-    # Combine standard English stopwords with additional stopwords
-    stopwords = nltk.corpus.stopwords.words('english') + ADDITIONAL_STOPWORDS
-
-    return [wnl.lemmatize(word) for word in words if word not in stopwords]
 
 #------------------------------------------------------------- NLTK -------------------------------------------------------------
 
