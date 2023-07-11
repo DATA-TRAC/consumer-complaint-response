@@ -18,8 +18,9 @@
 
   * Data acquired from [Google BigQuery](https://console.cloud.google.com/marketplace/product/cfpb/complaint-database)
   * Joined ___created a CSV___
-  * ___ rows × __ columns *before* cleaning
+  * 3458906 rows × 18 columns *before* cleaning
   * ___ rows × __ columns *after* cleaning
+  
 * Prepare
 
   * dropped columns
@@ -57,7 +58,7 @@
 | company_name                          | Name of the company identified in the complaint by the consumer                             |
 | state                                 | Two letter postal abbreviation of the state of the mailing address provided by the consumer |
 | zip_code                              | The mailing ZIP code provided by the consumer                                               |
-| tags                                  | Data that supports easier searching and sorting of complaints                               |
+| tags                                  | Older American is aged 62 and older, Servicemember is Active/Guard/Reserve member or spouse |
 | consumer_consent_provided             | Identifies whether the consumer opted in to publish their complaint narrative               |
 | submitted_via                         | How the complaint was submitted to the CFPB                                                 |
 | date_sent_to_company                  | The date the CFPB sent the complaint to the company                                         |
@@ -67,33 +68,31 @@
 | complaint_id                          | Unique ID for complaints registered with the CFPB                                           |
 |                                       |                                                                                             |
 
-## Steps to Reproduce (in-progress)
+## Steps to Reproduce
 
 1) Clone this repo
-   * You may need to update your Python Libraries, our libraries were updated around June 2023
+   *  You may need to update your Python Libraries, my libraries were updated on 5 June, 2023 for this project
 2) For a quick run
    * Verify `import wrangle as w` is in the imports section of final_notebook
    * Run final_notebook
    * This will use a pre-built and cleaned dataset based off of the datasets from the longer run in step 3
 3) For the longer run
-   * ⚠️WARNING⚠️: These are steps we took to originally acquire the data. The steps take a lot of time (and space) and may not even be the best way of doing it. We highly recommend to do the quick run in step 2 unless you want to know how we got the data.
+   * ⚠️WARNING⚠️: These are almost the same steps I took to originally acquire the data. The steps take a lot of time (and space) and may not even be the best way of doing it. I highly recommend to do the quick run in step 2 unless you want to know how I got the data.
    * Verify `import big_wrangle as w` is in the imports section of final_notebook
-   * Install the 'pandas-gbq' package
+   * Install the pandas-gbq package
      * `conda install pandas-gbq --channel conda-forge`
      * `pip install pandas-gbq`
-        * pip install is quicker
    * Go to Google BigQuery and create a project
      * Copy and run the 'long-sql' queries found in `big_wrangle.py` in [Google BigQuery](https://cloud.google.com/bigquery/public-data)
        * Click on 'Go to Datasets in Cloud Marketplace' and search for 'CFPB' or 'complain' and view the dataset to open a quick sql prompt to query in
      * Save each result as a BigQuery table in your project
-       * You can look in `big_wrangle.py` for what we named the project, database, and table
+       * You can look in `big_wrangle.py` for what I named my project, database, and tables
      * Edit and save the 'small-sql' query variables found in `big_wrangle.py` to the respective table names in your BigQuery project using this format: `FROM 'database.table'` and edit the 'project_ID' variable to your project's ID
-     * Create a [Service Account](https://console.cloud.google.com/iam-admin/serviceaccounts) and key (JSON)
-       * After creating a Service Account, click on the name of it and go to the KEYS tab
-       * Create a Key as a JSON and save it to the repo as `service_key.json`
    * Run final_notebook
-   * This will run through the longer pathway of getting the dataset from the source and clean/prep
-     * It will probably take awhile (millions of rows, +2GB), hence we do not recommend
+     * It may ask for authentication when it tries to query Google BigQuery
+     * Try to run again if it stopped for authentication
+   * This will run through the longer pathway of getting the datasets from the source and merge/clean/prep
+     * It will probably take awhile (millions of rows, +2GB), hence I do not recommend
 
 ---
 
