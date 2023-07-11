@@ -29,7 +29,10 @@
 * product
   * no nulls
   * credit related
+  * *ENGINEERED FEATURE*
     * **bin related products/services together**
+        * bins = credit_report, credit_card, debt_collection, mortgage, bank, loans, and money_service
+    * **drop after engineering**
 * subproduct
   * 7% null
   * top value = credit reporting
@@ -104,8 +107,8 @@
 
 ### Post Cleaning Inspection
 
-* 1246736 rows x 7 columns
-  * date_received, product, narrative, company_name, state, tags, company_response_to_customer (target)
+* 1246736 rows x 8 columns
+  * date_received, product_bins, narrative, company_name, state, tags, company_response_to_customer (target)
 
 ---
 
@@ -143,7 +146,6 @@
 | timely_response                       | Indicates whether the company gave a timely response or not                                 |
 | consumer_disputed                     | Whether the consumer disputed the company's response                                        |
 | complaint_id                          | Unique ID for complaints registered with the CFPB                                           |
-|                                       |                                                                                             |
 
 ## Steps to Reproduce
 
@@ -177,5 +179,4 @@
 
 ## Recommendations/Next Steps
 
-* Nice-To-Haves: Second iteration looking at discrimination based on zip code/state and company response, applying model to in_progress complaints and see what it predicts based on the language after company response
-
+* Nice-To-Haves: Second iteration looking at discrimination based on zip code/state and company response, applying model to in_progress complaints and see what it predicts based on the language after company response, 16 SVB complaints -- *can possibly add as an end project application/impact to identify fraudulent activity or discrimination based on customer complaints
