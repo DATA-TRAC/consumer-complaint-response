@@ -123,6 +123,7 @@
 5. Is there a relationship/bias for servicemember tags in relation to company response?
 6. Does narrative length relate to company response?
 7. What are the payout words that got a company response of closed with monetary relief?
+8. Which product is more likely to have relief/monetary relief?
     
 ## Data Dictionary
 
