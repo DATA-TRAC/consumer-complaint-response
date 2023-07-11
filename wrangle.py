@@ -20,6 +20,9 @@ import nltk
 from nltk.tokenize.toktok import ToktokTokenizer
 from nltk.corpus import stopwords
 
+#nltk sentiment
+from nltk.sentiment import SentimentIntensityAnalyzer
+
 #ignore warnings
 import warnings
 warnings.filterwarnings("ignore")
@@ -181,9 +184,7 @@ def clean(text):
     
     return cleaned_words
 
-#------------------------------------------------------------- VIZZES -------------------------------------------------------------
-
-from nltk.sentiment import SentimentIntensityAnalyzer
+#------------------------------------------------------------- NLTK -------------------------------------------------------------
 
 # Initialize the sentiment intensity analyzer
 sia = SentimentIntensityAnalyzer()
@@ -193,5 +194,3 @@ df['consumer_complaint_narrative'] = df['consumer_complaint_narrative'].fillna('
 
 # Apply the sentiment intensity analyzer to the 'consumer_complaint_narrative' column
 df['sentiment'] = df['consumer_complaint_narrative'].apply(lambda complaint: sia.polarity_scores(complaint))
-
-# Now each complaint has a sentiment score
