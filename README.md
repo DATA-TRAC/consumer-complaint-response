@@ -10,8 +10,8 @@
 
 ### Initial Thoughts
 
-* There are going to be key words that match to a companies response
-* Sentiment analysis will not be useful because most complaints will likely be negative
+* There are going to be key words that match to a companies response.
+* Sentiment analysis will not be useful because most complaints will likely be negative.
 
 ## The Plan
 
@@ -102,9 +102,9 @@
 
 ---
 
-### Post Univariate Inspection
+### Post Cleaning Inspection
 
-* 1246736 rows x 7 columns *after* cleaning
+* 1246736 rows x 7 columns
   * date_received, product, narrative, company_name, state, tags, company_response_to_customer (target)
 
 ---
