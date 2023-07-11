@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 #prepare imports
+import re
 import unicodedata
 import nltk
 from nltk.tokenize.toktok import ToktokTokenizer
