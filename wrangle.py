@@ -208,7 +208,7 @@ def sentiment_analysis(df):
     sia = SentimentIntensityAnalyzer()
 
     # Apply the sentiment intensity analyzer to the 'consumer_complaint_narrative' column
-    df['sentiment'] = df['narrative'].apply(lambda complaint: sia.polarity_scores(complaint))
+    df['sentiment'] = df['lemon'].apply(lambda complaint: sia.polarity_scores(complaint))
 
 #------------------------------------------------------------- SPLIT ------------------------------------------------------------
 
