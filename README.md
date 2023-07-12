@@ -117,16 +117,20 @@
 
 ### Explore
 
-* Questions
+* Questions:
 
 1. Do specific issues tend to receive particular responses? For example, do fraud-related issues tend to receive more "closed with relief" responses compared to other issues?
-2. Is there a relationship between consumer complaints and company response?
-3. Do narratives with a neutral or positive sentiment analysis relating to bank account products lead to a response of closed with monetary relief?
+      a. What are the payout words that got a company response of closed with monetary relief?
+      b. Is there a relationship between consumer complaints and company response?
+2. Do consumers in some states receive monetary relief more frequently than others?
+3. Do narratives with a neutral or positive sentiment analysis relating to bank account products lead to a response of closed 
+   with monetary relief?
 4. Are there unique words associated with the most negative and most positive company responses?
 5. Is there a relationship/bias for servicemember tags in relation to company response?
 6. Does narrative length relate to company response?
-7. What are the payout words that got a company response of closed with monetary relief?
+7. Do some companies proportionally give better or worse responses (relief/no relief)?
 8. Which product is more likely to have relief/monetary relief?
+9. Are there more complaints during certain seasons of the year?
     
 ## Data Dictionary
 
