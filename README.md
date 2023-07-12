@@ -10,7 +10,7 @@
 
 ### Initial Thoughts
 
-* There are going to be key words that match to a companies response.
+* There are going to be keywords that match a company's response.
 * Sentiment analysis will not be useful because most complaints will likely be negative.
 
 ## The Plan
@@ -23,7 +23,7 @@
 ### Prepare
 
 * date_received
-  * changed date to datetime
+  * changed date to DateTime
   * no nulls
   * 2015 to 2023
 * product
@@ -42,7 +42,7 @@
 * issue
   * no nulls
   * 165 unique values
-  * concat into consumer_complaint_narrative column to address those nulls and then drop issue
+  * concat into consumer_complaint_narrative column to address those nulls and then drop the issue
     * **drop column**
 * subissue
   * 20% null
@@ -52,6 +52,7 @@
   * 64% null
   * renamed to narrative
      * **drop null values**
+     *  **column dropped after nltk language cleaning**
 * company_public_response
   * 56% null
     * **drop column**
@@ -103,14 +104,14 @@
   * no nulls
     * **drop for MVP: nice-to-have for second iteration**
 * Used NLTK to clean each document resulting in:
-  * 3 new columns: clean (removes redacted XXs, and stopwords removed), and lemon (lemmatized).
+  * 2 new columns: clean (removes redacted XXs, and stopwords removed) and lemon (lemmatized).
 
 ---
 
 ### Post Cleaning Inspection
 
-* 1246736 rows x 10 columns
-  * date_received, product_bins, narrative, company_name, state, tags, company_response_to_customer (target), clean, lemon
+* 1246736 rows x 8 columns
+  * date_received, product_bins, company_name, state, tags, company_response_to_customer (target), clean, lemon
 
 ---
 
@@ -166,14 +167,14 @@
      * `pip install pandas-gbq`
    * Go to Google BigQuery and create a project
      * Copy and run the 'long-SQL queries found in `big_wrangle.py` in [Google BigQuery](https://cloud.google.com/bigquery/public-data)
-       * Click on 'Go to Datasets in Cloud Marketplace' and search for 'CFPB' or 'complain' and view the dataset to open a quick sql prompt to query in
+       * Click on 'Go to Datasets in Cloud Marketplace' and search for 'CFPB' or 'complain' and view the dataset to open a quick SQL prompt to query in
      * Save each result as a BigQuery table in your project
        * You can look in `big_wrangle.py` for what I named my project, database, and tables
      * Edit and save the 'small-SQL query variables found in `big_wrangle.py` to the respective table names in your BigQuery project using this format: `FROM 'database. table'` and edit the 'project_ID' variable to your project's ID
    * Run final_notebook
      * It may ask for authentication when it tries to query Google BigQuery
      * Try to run again if it stopped for authentication
-   * This will run through the longer pathway of getting the datasets from the source and merging/clean/prep
+   * This will run through the longer pathway of getting the datasets from the source and merging/cleaning/prep
      * It will probably take a while (millions of rows, +2GB), hence I do not recommend
 
 ---
