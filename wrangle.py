@@ -180,7 +180,12 @@ def remove_stopwords(string, extra_words=None, exclude_words=None):
     words = string.split()
     filtered = [word for word in words if word not in sls]
     string = ' '.join(filtered)
-    return string
+    corpus_words = set(nltk.corpus.words.words())
+    return " ".join(
+        w
+        for w in nltk.tokenize.wordpunct_tokenize(words)
+        if w.lower() in corpus_words or not w.isalpha()
+    )
 
 def prep_narrative(df):
     """
@@ -197,9 +202,9 @@ def prep_narrative(df):
     # remove specials
     sls = ["&#9;", "12", "'"]
     # Derive column 'clean' from column: cleanup up 'readme_contents'
-    df = df.assign(clean = df.apply(lambda row : ' '.join([word for word in (token_it_up(basic_clean(re.sub(r'[X{1,}\d\']', '', string=row.narrative)))).split() if word not in sls]), axis=1))
+    df = df.assign(clean = df.apply(lambda row : ' '.join([word for word in (token_it_up(basic_clean(re.sub(r'[X{1,}\d\']', ' ', string=row.narrative)))).split() if word not in sls]), axis=1))
     # Derive column 'lemmatized' from column: lemmatized 'clean'
-    df = df.assign(lemon = df.apply(lambda row : lemmad(remove_stopwords(row.clean)), axis=1))
+    df = df.assign(lemon = df.apply(lambda row : lemmad(remove_stopwords(row.clean,sls)), axis=1))
     # Drop narrative column
     df = df.drop(columns={'narrative'})
     # return prepped df
