@@ -103,14 +103,14 @@
   * no nulls
     * **drop for MVP: nice-to-have for second iteration**
 * Used NLTK to clean each document resulting in:
-  * 3 new columns: no_x (removes redacted XXs, specials and stopwords removed), and lemon (lemmatized).
+  * 3 new columns: clean (removes redacted XXs, and stopwords removed), and lemon (lemmatized).
 
 ---
 
 ### Post Cleaning Inspection
 
 * 1246736 rows x 10 columns
-  * date_received, product_bins, narrative, company_name, state, tags, company_response_to_customer (target), no_x, lemon
+  * date_received, product_bins, narrative, company_name, state, tags, company_response_to_customer (target), clean, lemon
 
 ---
 
