@@ -184,17 +184,22 @@ def remove_stopwords(string, extra_words=None, exclude_words=None):
 
 def prep_narrative(df):
     """
-    The function `prep_narrative` takes a DataFrame as input, performs several data cleaning and
-    preprocessing steps on the 'narrative' column, and returns the modified DataFrame.
+    The function `prep_narrative` takes a DataFrame as input and performs several cleaning and
+    preprocessing steps on the 'narrative' column, including removing special characters, tokenizing,
+    basic cleaning, removing stopwords, and lemmatizing. The function then returns the preprocessed
+    DataFrame.
     
-    :param df: The parameter `df` is a pandas DataFrame that contains a column named 'narrative'
-    :return: the prepped dataframe (df) with additional columns: 'no_x', 'clean', and 'lemon'.
+    :param df: The parameter `df` is a pandas DataFrame that contains a column named 'narrative'. This
+    column contains text data that needs to be preprocessed
+    :return: the prepped dataframe, which includes the original columns as well as the derived columns
+    'clean' and 'lemon'.
     """
-    df = df.assign(no_x = df.apply(lambda row : re.sub(r'[X{1,}\d\']', '', row.narrative), axis=1))
+    # remove specials
+    sls = ['&#9;']
     # Derive column 'clean' from column: cleanup up 'readme_contents'
-    df = df.assign(clean = df.apply(lambda row : remove_stopwords(token_it_up(basic_clean(row.no_x))), axis=1))
+    df = df.assign(clean = df.apply(lambda row : ' '.join([word for word in (token_it_up(basic_clean(re.sub(r'[X{1,}\d\']', '', string=row.narrative)))).split() if word not in sls]), axis=1))
     # Derive column 'lemmatized' from column: lemmatized 'clean'
-    df = df.assign(lemon = df.apply(lambda row : lemmad(row.clean), axis=1))
+    df = df.assign(lemon = df.apply(lambda row : lemmad(remove_stopwords(row.clean)), axis=1))
     # return prepped df
     return df
 
