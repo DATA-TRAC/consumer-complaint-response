@@ -57,10 +57,10 @@
     * **drop column**
 * company_name
   * no nulls
-  * 6,694 companies
+  * 6,694 Companies
     * **16 SVB complaints -- *can possibly add as an end project application/impact to identify fraudulent activity or discrimination based on customer complaints***
     * **SPICY**
-* state
+* State
   * 1% null
   * based on per capita, population, and state size...
   * keep for purposes of exploration
@@ -73,10 +73,10 @@
     * **drop for MVP: nice-to-have for second iteration**
 * tags
   * 89% null
-  * domain knowledge: 62 and older accounted for senior - pulled straight from source
+  * domain knowledge: 62 and older accounted for senior - pulled straight from the source
     * **impute nulls with "Average Person**
 * consumer_consent_provided
-  * does not relate to target
+  * does not relate to the target
     * **drop column**
 * submitted_via
   * no nulls
@@ -86,11 +86,11 @@
     * **drop column**
 * company_response_to_consumer
   * 4 nulls = 0%
-    * **drop these 4 rows because this is the target column**
+    * **Drop these 4 rows because this is the target column**
   * 8 unique values
-    * **investigate the difference between closed without relief and closed with relief**
-    * **NICE_TO_HAVE: applying model to in_progress complaints and see what it predicts based on the language**
-    * **drop 'in progress' response because there is no conclusion**
+    * **Investigate the difference between closed without relief and closed with relief**
+    * **NICE_TO_HAVE: applying the model to in_progress complaints and see what it predicts based on the language**
+    * **Drop 'in progress' response because there is no conclusion**
   * 7 unique values
 * timely_response
   * no nulls
@@ -103,14 +103,14 @@
   * no nulls
     * **drop for MVP: nice-to-have for second iteration**
 * Used NLTK to clean each document resulting in:
-  * 3 new columns: no_x (removes redacted XX's), clean (specials and stopwords removed), and lemon (lemmatized).
+  * 3 new columns: no_x (removes redacted XXs, specials and stopwords removed), and lemon (lemmatized).
 
 ---
 
 ### Post Cleaning Inspection
 
 * 1246736 rows x 10 columns
-  * date_received, product_bins, narrative, company_name, state, tags, company_response_to_customer (target), no_x, clean, lemon
+  * date_received, product_bins, narrative, company_name, state, tags, company_response_to_customer (target), no_x, lemon
 
 ---
 
@@ -118,10 +118,10 @@
 
 * Questions
 
-1. Do specific issues tend to receive specific responses? For example, do issues related to fraud tend to receive more "closed with relief" responses compared to other issues?
-2. Is there a relationship between consumer complaint and company response?
+1. Do specific issues tend to receive particular responses? For example, do fraud-related issues tend to receive more "closed with relief" responses compared to other issues?
+2. Is there a relationship between consumer complaints and company response?
 3. Do narratives with a neutral or positive sentiment analysis relating to bank account products lead to a response of closed with monetary relief?
-4. Are there unique words associated with the most negative and most positive company response?
+4. Are there unique words associated with the most negative and most positive company responses?
 5. Is there a relationship/bias for servicemember tags in relation to company response?
 6. Does narrative length relate to company response?
 7. What are the payout words that got a company response of closed with monetary relief?
@@ -139,7 +139,7 @@
 | consumer_complaint_narrative          | A description of the complaint provided by the consumer                                     |
 | company_public_response               | The company's optional public-facing response to a consumer's complaint                     |
 | company_name                          | Name of the company identified in the complaint by the consumer                             |
-| state                                 | Two letter postal abbreviation of the state of the mailing address provided by the consumer |
+| state                                 | Two-letter postal abbreviation of the state of the mailing address provided by the consumer |
 | zip_code                              | The mailing ZIP code provided by the consumer                                               |
 | tags                                  | Older American is aged 62 and older, Servicemember is Active/Guard/Reserve member or spouse |
 | consumer_consent_provided             | Identifies whether the consumer opted in to publish their complaint narrative               |
@@ -153,28 +153,28 @@
 ## Steps to Reproduce
 
 1) Clone this repo
-   * You may need to update your Python Libraries, my libraries were updated on 5 June, 2023 for this project
+   * You may need to update your Python Libraries, my libraries were updated on 5 June 2023 for this project
 2) For a quick run
    * Verify `import wrangle as w` is in the imports section of final_notebook
    * Run final_notebook
-   * This will use a pre-built and cleaned dataset based off of the datasets from the longer run in step 3
+   * This will use a pre-built and cleaned dataset based on the datasets from the longer run in step 3
 3) For the longer run
-   * ⚠️WARNING⚠️: These are almost the same steps I took to originally acquire the data. The steps take a lot of time (and space) and may not even be the best way of doing it. I highly recommend to do the quick run in step 2 unless you want to know how I got the data.
+   * ⚠️WARNING⚠️: These are almost the same steps I took to originally acquire the data. The steps take a lot of time (and space) and may not even be the best way of doing it. I highly recommend doing the quick run in step 2 unless you want to know how I got the data.
    * Verify `import big_wrangle as w` is in the imports section of final_notebook
    * Install the pandas-gbq package
      * `conda install pandas-gbq --channel conda-forge`
      * `pip install pandas-gbq`
    * Go to Google BigQuery and create a project
-     * Copy and run the 'long-sql' queries found in `big_wrangle.py` in [Google BigQuery](https://cloud.google.com/bigquery/public-data)
+     * Copy and run the 'long-SQL queries found in `big_wrangle.py` in [Google BigQuery](https://cloud.google.com/bigquery/public-data)
        * Click on 'Go to Datasets in Cloud Marketplace' and search for 'CFPB' or 'complain' and view the dataset to open a quick sql prompt to query in
      * Save each result as a BigQuery table in your project
        * You can look in `big_wrangle.py` for what I named my project, database, and tables
-     * Edit and save the 'small-sql' query variables found in `big_wrangle.py` to the respective table names in your BigQuery project using this format: `FROM 'database.table'` and edit the 'project_ID' variable to your project's ID
+     * Edit and save the 'small-SQL query variables found in `big_wrangle.py` to the respective table names in your BigQuery project using this format: `FROM 'database. table'` and edit the 'project_ID' variable to your project's ID
    * Run final_notebook
      * It may ask for authentication when it tries to query Google BigQuery
      * Try to run again if it stopped for authentication
-   * This will run through the longer pathway of getting the datasets from the source and merge/clean/prep
-     * It will probably take awhile (millions of rows, +2GB), hence I do not recommend
+   * This will run through the longer pathway of getting the datasets from the source and merging/clean/prep
+     * It will probably take a while (millions of rows, +2GB), hence I do not recommend
 
 ---
 
@@ -182,4 +182,4 @@
 
 ## Recommendations/Next Steps
 
-* Nice-To-Haves: Second iteration looking at discrimination based on zip code/state and company response, applying model to in_progress complaints and see what it predicts based on the language after company response, 16 SVB complaints -- *can possibly add as an end project application/impact to identify fraudulent activity or discrimination based on customer complaints
+* Nice-To-Haves: Second iteration looking at discrimination based on zip code/state and company response, applying the model to in_progress complaints and see what it predicts based on the language after company response, 16 SVB complaints -- *can possibly add as an end project application/impact to identify fraudulent activity or discrimination based on customer complaints
