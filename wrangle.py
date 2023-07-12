@@ -124,7 +124,7 @@ def basic_clean(string):
     """
     string = string.lower()
     string = unicodedata.normalize('NFKD', string).encode('ascii','ignore').decode('utf-8')
-    string = re.sub(r'[^a-z0-9\'\s]', '', string)
+    string = re.sub(r'[^a-z0-9\'\s]', ' ', string)
     return string
 
 def token_it_up(string):
@@ -195,11 +195,13 @@ def prep_narrative(df):
     'clean' and 'lemon'.
     """
     # remove specials
-    sls = ['&#9;']
+    sls = ["&#9;", "12", "'"]
     # Derive column 'clean' from column: cleanup up 'readme_contents'
     df = df.assign(clean = df.apply(lambda row : ' '.join([word for word in (token_it_up(basic_clean(re.sub(r'[X{1,}\d\']', '', string=row.narrative)))).split() if word not in sls]), axis=1))
     # Derive column 'lemmatized' from column: lemmatized 'clean'
     df = df.assign(lemon = df.apply(lambda row : lemmad(remove_stopwords(row.clean)), axis=1))
+    # Drop narrative column
+    df = df.drop(columns={'narrative'})
     # return prepped df
     return df
 
