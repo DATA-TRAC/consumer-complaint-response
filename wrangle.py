@@ -202,13 +202,14 @@ def prep_narrative(df):
 
 def sentiment_analysis(df):
     '''
-    this function applies NLTK sentiment analysis to each narrative in the df
+    This function applies NLTK sentiment analysis to each narrative in the df.
     '''
     # Initialize the sentiment intensity analyzer
     sia = SentimentIntensityAnalyzer()
 
-    # Apply the sentiment intensity analyzer to the 'consumer_complaint_narrative' column
-    df['sentiment'] = df['lemon'].apply(lambda complaint: sia.polarity_scores(complaint))
+    # Apply the sentiment intensity analyzer to the 'lemon' column
+    df['sentiment'] = df['lemon'].apply(lambda complaint: sia.polarity_scores(complaint)['compound'] if isinstance(complaint, str) else None)
+    return df
 
 #------------------------------------------------------------- SPLIT ------------------------------------------------------------
 
