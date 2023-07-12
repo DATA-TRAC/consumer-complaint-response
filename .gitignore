@@ -12,6 +12,7 @@ archive/
 *.json
 *.crc
 _SUCCESS
+*.parquet
 
 # Byte-compiled / optimized / DLL files
 *.py[cod]
