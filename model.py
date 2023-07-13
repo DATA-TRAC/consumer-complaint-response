@@ -22,6 +22,10 @@ import nltk.sentiment
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 
+#feature importance
+from sklearn.feature_selection import SelectKBest
+from sklearn.feature_selection import chi2
+
 
 
 """
@@ -186,7 +190,7 @@ def select_kbest(X, y, k=2):
     ---
     Format: kbest_results = function()
     '''
-    kbest = SelectKBest(f_regression, k=k)
+    kbest = SelectKBest(chi2, k=k)
     kbest.fit(X, y)
     mask = kbest.get_support()
     kbest_results = pd.DataFrame(
