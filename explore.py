@@ -201,9 +201,9 @@ def analyze_sentiment(sentiment_df, alpha=0.05,truncate=False):
         print("ANOVA p-value:", result.pvalue)
 
         if result.pvalue < alpha:
-            print("The p-value is less than alpha. There is a significant effect of sentiment on company response to the consumer.")
+            print("There is a significant effect of sentiment on company response to the consumer.")
         else:
-            print("The p-value is greater than or equal to alpha. There is no significant effect of sentiment on company response to the consumer.")
+            print("There is no significant effect of sentiment on company response to the consumer.")
 
         print()  # Print an empty line between each category's results
 
