@@ -127,6 +127,8 @@
       * New Question to 1
         - Is there a relationship between consumer complaint words and company response?
                 a. Are there unique words associated with each product, and is there a relationship between unique product words and possible response from the company?
+                or 
+                Is there a relationship between consumer complaint words and company response?"
                 
 3. Do narratives with a neutral or positive sentiment analysis relating to bank account products lead to a response of closed 
    with monetary relief?
@@ -139,7 +141,7 @@
       * is an association to question 4 - its a keep
       
       
-    
+*****************************************    
 
 5. Is there a relationship/bias for servicemember tags in relation to company response?
       * good but it's better after MVP
