@@ -134,4 +134,159 @@ def calculate_average_letter_count(df):
     plt.ylabel('Average Letter Count')
     plt.title('Average Letter Count by Language')
     plt.show()
-    sc.compare_categorical_continuous('language', 'letter_count', df)        
+    sc.compare_categorical_continuous('language', 'letter_count', df)  
+
+def analyze_sentiment(sentiment_df, alpha=0.05,truncate=False):
+    """Analyzes sentiment and company response to consumer across product bins.
+    This function answers the question: Do narratives with a neutral or positive sentiment
+    analysis relating to bank account products lead to a response of closed with monetary relief?"""
+
+    # Set the figure size
+    plt.figure(figsize=(10, 6))
+
+    # Customize the plot style
+    sns.set(style="whitegrid")
+
+    # Create the bar plot
+    sns.barplot(data=sentiment_df, x='product_bins', y='sentiment', hue='company_response_to_consumer', ci=None, color='purple')
+
+    # Set the labels and title
+    plt.xlabel('Product Bins')
+    plt.ylabel('Sentiment')
+    plt.title('Company Response to Consumer and Sentiment Analysis across Product Bins')
+
+    # Adjust the legend position
+    plt.legend(loc='best')
+
+    # Show the plot
+    plt.show()
+
+   # Create example data for Levene test
+    group1 = np.random.normal(loc=10, scale=2, size=100)
+    group2 = np.random.normal(loc=12, scale=2, size=100)
+
+    # Calculate the theoretical means for each group
+    theoretical_mean_group1 = np.mean(group1)
+    theoretical_mean_group2 = np.mean(group2)
+
+    # Perform Levene test for variance comparison
+    tstat, pvalue = stats.levene(group1, group2)
+
+    print("Running Levene Test...")
+    if pvalue > alpha:
+        print(f'p-value: {pvalue:.10f} > {alpha}?')
+        print()
+        print("Variance is true, proceed with ANOVA test...")
+        print()
+    else:
+        print("p-value:", pvalue)
+        print()
+        print("Variance is not true. Consider alternative tests for comparing groups.")
+        print()
+
+    # Get unique categories of product_bins
+    unique_bins = sentiment_df['product_bins'].unique()
+
+    # Perform ANOVA test for each category of product_bins
+    for bin_category in unique_bins:
+        # Create a subset of the data for the specific product_bins category
+        subset = sentiment_df[sentiment_df['product_bins'] == bin_category]
+
+        # Perform one-way ANOVA for the subset
+        result = stats.f_oneway(*[subset[subset['company_response_to_consumer'] == response]['sentiment']
+                                  for response in subset['company_response_to_consumer'].unique()])
+
+        # Print the ANOVA test result for the subset
+        print("Product Bins:", bin_category)
+        print("ANOVA p-value:", result.pvalue)
+
+        if result.pvalue < alpha:
+            print("The p-value is less than alpha. There is a significant effect of sentiment on company response to the consumer.")
+        else:
+            print("The p-value is greater than or equal to alpha. There is no significant effect of sentiment on company response to the consumer.")
+
+        print()  # Print an empty line between each category's results
+
+def analyze_message_length(sentiment_df, alpha=0.05):
+    """
+    Analyzes the relationship between message length and company response to the consumer.
+    This function answers the question: Does narrative length relate to company response?
+    """
+
+    # Create the scatter plot
+    plt.scatter(sentiment_df['message_length'], sentiment_df['company_response_to_consumer'], cmap='Set1')
+
+    # Set the labels and title
+    plt.xlabel('Message Length')
+    plt.ylabel('Company Response to Consumer')
+    plt.title('Relationship between Message Length and Company Response to Consumer')
+
+    # Show the plot
+    plt.show()
+
+    # Perform ANOVA test
+    # The code then uses a list comprehension to iterate over each unique category.
+    result = stats.f_oneway(*[sentiment_df[sentiment_df['company_response_to_consumer'] == response]['message_length']
+                              for response in sentiment_df['company_response_to_consumer'].unique()])
+
+    p_value = result.pvalue
+
+    print("ANOVA p-value:", p_value)
+    if p_value < alpha:
+        print("The p-value is less than alpha. There is a significant relationship between message length and company response to the consumer.")
+    else:
+        print("The p-value is greater than or equal to alpha. There is no significant relationship between message length and company response to the consumer.")  
+
+def analyze_word_count(sentiment_df, alpha=0.05):
+    """
+    Analyzes the relationship between word count and company response to the consumer.
+    This function answers the question: Does narrative word count relate to company response?
+    """
+
+    # Create the scatter plot
+    plt.scatter(sentiment_df['message_length'], sentiment_df['company_response_to_consumer'], cmap='Set1')
+
+    # Set the labels and title
+    plt.xlabel('Message Length')
+    plt.ylabel('Company Response to Consumer')
+    plt.title('Relationship between Message Length and Company Response to Consumer')
+
+    # Show the plot
+    plt.show()
+
+    # Perform ANOVA test
+    # The code then uses a list comprehension to iterate over each unique category.
+    result = stats.f_oneway(*[sentiment_df[sentiment_df['company_response_to_consumer'] == response]['message_length']
+                              for response in sentiment_df['company_response_to_consumer'].unique()])
+
+    p_value = result.pvalue
+
+    print("ANOVA p-value:", p_value)
+    if p_value < alpha:
+        print("The p-value is less than alpha. There is a significant relationship between message length and company response to the consumer.")
+    else:
+        print("The p-value is greater than or equal to alpha. There is no significant relationship between message length and company response to the consumer.")
+    # Create the scatter plot
+    plt.scatter(sentiment_df['word_count'], sentiment_df['company_response_to_consumer'], cmap='Reds')
+
+    # Set the labels and title
+    plt.xlabel('Word Count')
+    plt.ylabel('Company Response to Consumer')
+    plt.title('Relationship between Word Count and Company Response to Consumer')
+
+    # Show the plot
+    plt.show()
+
+    # Perform ANOVA test
+    # The code uses a list comprehension to iterate over each unique category.
+    result = stats.f_oneway(*[sentiment_df[sentiment_df['company_response_to_consumer'] == response]['word_count']
+                              for response in sentiment_df['company_response_to_consumer'].unique()])
+
+    p_value = result.pvalue
+
+    print("ANOVA p-value:", p_value)
+    if p_value < alpha:
+        print("The p-value is less than alpha. There is a significant relationship between word count and company response to the consumer.")
+    else:
+        print("The p-value is greater than or equal to alpha. There is no significant relationship between word count and company response to the consumer.")
+
