@@ -119,18 +119,43 @@
 
 * Questions:
 
+
 1. Do specific issues tend to receive particular responses? For example, do fraud-related issues tend to receive more "closed with relief" responses compared to other issues?
       a. What are the payout words that got a company response of closed with monetary relief?
       b. Is there a relationship between consumer complaints and company response?
-2. Do consumers in some states receive monetary relief more frequently than others?
+      * Its a keep - we just need to word the question better
+      * New Question to 1
+        - Is there a relationship between consumer complaint words and company response?
+                a. Are there unique words associated with each product, and is there a relationship between unique product words and possible response from the company?
+                
 3. Do narratives with a neutral or positive sentiment analysis relating to bank account products lead to a response of closed 
    with monetary relief?
+      * good with stats
+      
 4. Are there unique words associated with the most negative and most positive company responses?
+      * good - its a keep
+
+8. Which product is more likely to have monetary relief?
+      * is an association to question 4 - its a keep
+      
+      
+    
+
 5. Is there a relationship/bias for servicemember tags in relation to company response?
-6. Does narrative length relate to company response?
+      * good but it's better after MVP
+      NEW - Is the company response independent from a consumer being a service member or not?
+          - Is the company response independent from a consumer having a tag?
+
 7. Do some companies proportionally give better or worse responses (relief/no relief)?
-8. Which product is more likely to have relief/monetary relief?
+      * Look at this after MVP
+6. Does narrative length relate to company response?
+      * plain answer - may be out
+2. Do consumers in some states receive monetary relief more frequently than others?
+      * Look at this after MVP
 9. Are there more complaints during certain seasons of the year?
+      * not useful for modeling - OUT
+                
+                
     
 ## Data Dictionary
 
@@ -154,6 +179,16 @@
 | timely_response                       | Indicates whether the company gave a timely response or not                                 |
 | consumer_disputed                     | Whether the consumer disputed the company's response                                        |
 | complaint_id                          | Unique ID for complaints registered with the CFPB                                           |
+
+
+
+## Model
+    - Decission Tree
+    - KNN
+    - Multinomial
+    - 
+
+
 
 ## Steps to Reproduce
 
