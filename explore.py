@@ -3,6 +3,8 @@
 
 #standard imports
 import pandas as pd
+import numpy as np
+from scipy import stats
 
 #text
 import re
@@ -13,13 +15,22 @@ import nltk
 from wordcloud import WordCloud
 from sklearn.feature_extraction.text import CountVectorizer
 import matplotlib.pyplot as plt
+import seaborn as sns
 import wrangle as w
 
 # -----------------------------------------------------------------EXPLORE-----------------------------------------------------------------
 
 def unique_words(word_counts):
-    '''
-    '''
+    """
+    The function `unique_words` takes a DataFrame `word_counts` as input and creates a subplot of
+    horizontal bar plots, each showing the top 3 words with the highest count for a specific column in
+    the DataFrame.
+    
+    :param word_counts: The parameter `word_counts` is expected to be a DataFrame containing word counts
+    for different responses. Each column of the DataFrame represents a different response, and each row
+    represents a different word. The values in the DataFrame represent the count of each word in each
+    response
+    """
     # setting basic style parameters for matplotlib
     plt.rc('figure', figsize=(13, 7))
     plt.style.use('seaborn-darkgrid')
@@ -60,7 +71,7 @@ def get_words(train):
     this function extracts and counts words from a df based on different company responses.
     returns a word_count df containing the associated words for each response
     '''
-    #assinging all words to proper labels
+    #assigning all words to proper labels
     explanation_words = basic_clean_split(' '.join(train[train.company_response_to_consumer == 'Closed with explanation'].lemon))
     no_money_words = basic_clean_split(' '.join(train[train.company_response_to_consumer == 'Closed with non-monetary relief'].lemon))
     money_words = basic_clean_split(' '.join(train[train.company_response_to_consumer == 'Closed with monetary relief'].lemon))
@@ -68,7 +79,7 @@ def get_words(train):
     closed_words = basic_clean_split(' '.join(train[train.company_response_to_consumer == 'Closed'].lemon))
     all_words = basic_clean_split(' '.join(train.lemon))
     
-    #grabbing frequencies of occurences
+    #grabbing frequencies of occurrences
     explanation_freq = pd.Series(explanation_words).value_counts()
     no_money_freq = pd.Series(no_money_words).value_counts()
     money_freq = pd.Series(money_words).value_counts()
@@ -92,7 +103,7 @@ def get_words_products(train):
     this function extracts and counts words from a df based on different products.
     returns a word_count df containing the associated words for each product
     '''
-    #assinging all words to proper labels
+    #assigning all words to proper labels
     credit_report_words = basic_clean_split(' '.join(train[train.product_bins == 'credit_report'].lemon))
     debt_words = basic_clean_split(' '.join(train[train.product_bins == 'debt_collection'].lemon))
     credit_card_words = basic_clean_split(' '.join(train[train.product_bins == 'credit_card'].lemon))
@@ -102,7 +113,7 @@ def get_words_products(train):
     money_service_words = basic_clean_split(' '.join(train[train.product_bins == 'money_service'].lemon))
     all_words = basic_clean_split(' '.join(train.lemon))
     
-    #grabbing frequencies of occurences
+    #grabbing frequencies of occurrences
     credit_report_freq = pd.Series(credit_report_words).value_counts()
     debt_freq = pd.Series(debt_words).value_counts()
     credit_card_freq = pd.Series(credit_card_words).value_counts()
@@ -122,20 +133,6 @@ def get_words_products(train):
     print()
     
     return word_counts_products
-    
-def calculate_average_letter_count(df):
-    # Calculate the letter count for each row
-    df['letter_count'] = df['readme'].apply(lambda x: len(x))
-    # Group by language and calculate the average letter count
-    grouped_data = df.groupby('language').agg('mean')
-    print(grouped_data)
-    # Create a bar plot
-    plt.bar(grouped_data.index, grouped_data.letter_count)
-    plt.xlabel('Language')
-    plt.ylabel('Average Letter Count')
-    plt.title('Average Letter Count by Language')
-    plt.show()
-    sc.compare_categorical_continuous('language', 'letter_count', df)  
 
 def analyze_sentiment(alpha=0.05,truncate=False):
     """Analyzes sentiment and company response to consumer across product bins.
@@ -164,7 +161,7 @@ def analyze_sentiment(alpha=0.05,truncate=False):
     # Show the plot
     plt.show()
 
-   # Create example data for Levene test
+    # Create example data for Levene test
     group1 = np.random.normal(loc=10, scale=2, size=100)
     group2 = np.random.normal(loc=12, scale=2, size=100)
 
@@ -197,7 +194,7 @@ def analyze_sentiment(alpha=0.05,truncate=False):
 
         # Perform one-way ANOVA for the subset
         result = stats.f_oneway(*[subset[subset['company_response_to_consumer'] == response]['sentiment']
-                                  for response in subset['company_response_to_consumer'].unique()])
+                                    for response in subset['company_response_to_consumer'].unique()])
 
         # Print the ANOVA test result for the subset
         print("Product Bins:", bin_category)
@@ -230,7 +227,7 @@ def analyze_message_length(sentiment_df, alpha=0.05):
     # Perform ANOVA test
     # The code then uses a list comprehension to iterate over each unique category.
     result = stats.f_oneway(*[sentiment_df[sentiment_df['company_response_to_consumer'] == response]['message_length']
-                              for response in sentiment_df['company_response_to_consumer'].unique()])
+                                for response in sentiment_df['company_response_to_consumer'].unique()])
 
     p_value = result.pvalue
 
@@ -260,7 +257,7 @@ def analyze_word_count(sentiment_df, alpha=0.05):
     # Perform ANOVA test
     # The code then uses a list comprehension to iterate over each unique category.
     result = stats.f_oneway(*[sentiment_df[sentiment_df['company_response_to_consumer'] == response]['message_length']
-                              for response in sentiment_df['company_response_to_consumer'].unique()])
+                                for response in sentiment_df['company_response_to_consumer'].unique()])
 
     p_value = result.pvalue
 
@@ -283,7 +280,7 @@ def analyze_word_count(sentiment_df, alpha=0.05):
     # Perform ANOVA test
     # The code uses a list comprehension to iterate over each unique category.
     result = stats.f_oneway(*[sentiment_df[sentiment_df['company_response_to_consumer'] == response]['word_count']
-                              for response in sentiment_df['company_response_to_consumer'].unique()])
+                                for response in sentiment_df['company_response_to_consumer'].unique()])
 
     p_value = result.pvalue
 
@@ -292,4 +289,25 @@ def analyze_word_count(sentiment_df, alpha=0.05):
         print("The p-value is less than alpha. There is a significant relationship between word count and company response to the consumer.")
     else:
         print("The p-value is greater than or equal to alpha. There is no significant relationship between word count and company response to the consumer.")
+
+
+def monetary_product(train):
+    """
+    The function `monetary_product` creates a bar chart showing the proportions of monetary relief for
+    different product types based on a given dataset.
+    
+    :param train: The `train` parameter is a DataFrame that contains the training data for the model. It
+    should have columns named 'product_bins' and 'company_response_to_consumer'. The 'product_bins'
+    column represents the different types of products, and the 'company_response_to_consumer' column
+    represents the response of the
+    """
+    # make crosstab of product and responses and normalize to get product proportions
+    cross = pd.crosstab(train['product_bins'],train['company_response_to_consumer'],normalize='index')
+    # plot monetary relief products
+    cross['Closed with monetary relief'].sort_values(
+        ).plot(kind='barh', 
+                title='Proportions of Monetary Relief', 
+                xlabel='Proportion of Complaints for the Product', 
+                ylabel='Product Type');
+
 
