@@ -13,6 +13,7 @@ import nltk
 from wordcloud import WordCloud
 from sklearn.feature_extraction.text import CountVectorizer
 import matplotlib.pyplot as plt
+import wrangle as w
 
 # -----------------------------------------------------------------EXPLORE-----------------------------------------------------------------
 
@@ -136,11 +137,13 @@ def calculate_average_letter_count(df):
     plt.show()
     sc.compare_categorical_continuous('language', 'letter_count', df)  
 
-def analyze_sentiment(sentiment_df, alpha=0.05,truncate=False):
+def analyze_sentiment(alpha=0.05,truncate=False):
     """Analyzes sentiment and company response to consumer across product bins.
     This function answers the question: Do narratives with a neutral or positive sentiment
     analysis relating to bank account products lead to a response of closed with monetary relief?"""
 
+    # Running sentiment analysis and adding compound scores into the sentiment df. 
+    sentiment_df=w.sentiment_analysis(train)
     # Set the figure size
     plt.figure(figsize=(10, 6))
 
