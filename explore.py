@@ -23,47 +23,36 @@ def unique_words(word_counts):
     plt.rc('figure', figsize=(13, 7))
     plt.style.use('seaborn-darkgrid')
 
-    #viz
-    word_counts.sort_values('all', ascending=False)[1:21][['python', 'javascript', 'html', 'shell', 'java', 'go']].head(20).plot.barh()
-    plt.xlabel('Count')
-    plt.ylabel('Word')
-    plt.title('Word Identification per Language')
+    # Iterate over the columns of word_counts
+    for i, col in enumerate(word_counts.columns):
+        plt.subplot(3, 3, i+1)  # Adjust the subplot parameters as per your requirement
+
+        # Sort the values in the column in descending order and select the top 5
+        top_words = word_counts[col].sort_values(ascending=False).head(3)
+
+        # Create a horizontal bar plot
+        top_words.plot.barh()
+
+        plt.xlabel('Count')
+        plt.ylabel('Word')
+        plt.title(f'Word Identification per Response: Sorted on {col}')
+
+    plt.tight_layout()  # Adjust the layout to avoid overlapping subplots
     plt.show()
 
-def show_counts_and_ratios(df, column):
+def basic_clean_split(string):
     """
-    Takes in a dataframe and a string of a single column
-    Returns a dataframe with absolute value counts and percentage value counts
+    The function `basic_clean` takes a string as input and performs basic cleaning operations such as
+    converting the string to lowercase, removing non-alphanumeric characters, and normalizing unicode
+    characters.
+    
+    :param string: The parameter "string" is a string that you want to perform basic cleaning on
+    :return: The function `basic_clean` returns a cleaned version of the input string.
     """
-    labels = pd.concat([df[column].value_counts(),
-                    df[column].value_counts(normalize=True)], axis=1).round(2)
-    labels.columns = ['n', 'percent']
-    labels
-    return labels
-
-def clean(text):
-    '''
-    a simple function to cleanup text data. returns a list of lemmatized words after cleaning.
-    '''
-    # Normalize text by removing diacritics, encoding to ASCII, decoding to UTF-8, and converting to lowercase
-    text = (unicodedata.normalize('NFKD', text)
-             .encode('ascii', 'ignore')
-             .decode('utf-8', 'ignore') #most frequently used for base text creation - works great with SQL
-             .lower())
-    
-    # Remove punctuation, split text into words
-    words = re.sub(r'[^\w\s]', '', text).split()
-    
-    # Initialize WordNet lemmatizer
-    wnl = nltk.stem.WordNetLemmatizer()
-    
-    # Combine standard English stopwords
-    stopwords = nltk.corpus.stopwords.words('english')
-    
-    # Lemmatize words and remove stopwords
-    cleaned_words = [wnl.lemmatize(word) for word in words if word not in stopwords]
-    
-    return cleaned_words
+    string = string.lower()
+    string = unicodedata.normalize('NFKD', string).encode('ascii','ignore').decode('utf-8')
+    string = re.sub(r'[^a-z0-9\'\s]', ' ', string).split()
+    return string
 
 def get_words(train):
     '''
@@ -71,12 +60,12 @@ def get_words(train):
     returns a word_count df containing the associated words for each response
     '''
     #assinging all words to proper labels
-    explanation_words = (' '.join(train[train.company_response_to_consumer == 'Closed with explanation'].lemon))
-    no_money_words = (' '.join(train[train.company_response_to_consumer == 'Closed with non-monetary relief'].lemon))
-    money_words = (' '.join(train[train.company_response_to_consumer == 'Closed with monetary relief'].lemon))
-    timed_out_words = (' '.join(train[train.company_response_to_consumer == 'Untimely response'].lemon))
-    closed_words = (' '.join(train[train.company_response_to_consumer == 'Closed'].lemon))
-    all_words = (' '.join(train.lemon))
+    explanation_words = basic_clean_split(' '.join(train[train.company_response_to_consumer == 'Closed with explanation'].lemon))
+    no_money_words = basic_clean_split(' '.join(train[train.company_response_to_consumer == 'Closed with non-monetary relief'].lemon))
+    money_words = basic_clean_split(' '.join(train[train.company_response_to_consumer == 'Closed with monetary relief'].lemon))
+    timed_out_words = basic_clean_split(' '.join(train[train.company_response_to_consumer == 'Untimely response'].lemon))
+    closed_words = basic_clean_split(' '.join(train[train.company_response_to_consumer == 'Closed'].lemon))
+    all_words = basic_clean_split(' '.join(train.lemon))
     
     #grabbing frequencies of occurences
     explanation_freq = pd.Series(explanation_words).value_counts()
@@ -92,74 +81,47 @@ def get_words(train):
                 .fillna(0)
                 .apply(lambda s: s.astype(int)))
     
-    print(f"Total Unique Words Found per Response:{word_counts.shape[0]}")
+    print(f"Total Unique Words Found per Response: {word_counts.shape[0]}")
     print()
     
-    return word_counts
+    return word_counts    
+
+def get_words_products(train):
+    '''
+    this function extracts and counts words from a df based on different products.
+    returns a word_count df containing the associated words for each product
+    '''
+    #assinging all words to proper labels
+    credit_report_words = basic_clean(' '.join(train[train.product_bins == 'credit_report'].lemon))
+    debt_words = basic_clean(' '.join(train[train.product_bins == 'debt_collection'].lemon))
+    credit_card_words = basic_clean(' '.join(train[train.product_bins == 'credit_card'].lemon))
+    mortgage_words = basic_clean(' '.join(train[train.product_bins == 'mortgage'].lemon))
+    loans_words = basic_clean(' '.join(train[train.product_bins == 'loans'].lemon))
+    bank_words = basic_clean(' '.join(train[train.product_bins == 'bank'].lemon))
+    money_service_words = basic_clean(' '.join(train[train.product_bins == 'money_service'].lemon))
+    all_words = basic_clean(' '.join(train.lemon))
     
+    #grabbing frequencies of occurences
+    credit_report_freq = pd.Series(credit_report_words).value_counts()
+    debt_freq = pd.Series(debt_words).value_counts()
+    credit_card_freq = pd.Series(credit_card_words).value_counts()
+    mortgage_freq = pd.Series(mortgage_words).value_counts()
+    loans_freq = pd.Series(loans_words).value_counts()
+    bank_freq = pd.Series(bank_words).value_counts()
+    money_service_freq = pd.Series(money_service_words).value_counts()
+    all_freq = pd.Series(all_words).value_counts()
 
-def plot_unique_words_and_compare(df):
-    '''
-    this function uses the nested function to perform a stats test 
-    '''
-    def plot_unique_words_per_language(df):
-        '''
-        plots the count of unique words used per language (excluding 'all' and 'other') and compares them.
-        '''
-        word_counts = df.groupby('language')['text'].transform(lambda x: len(set(x.str.split().sum())))
-        word_counts = word_counts.drop(columns={'all', 'other'})
-        word_counts.nunique().plot.barh()
-        plt.title('Unique Words Used Per Language (excluding other)')
-        plt.xlabel('Count')
-        plt.ylabel('Language')
-        plt.show()
-
-    plot_unique_words_per_language(df)
-    sc.compare_categorical_continuous(df['language'], df['count'], df)
-
-
-
-def plot_language_distribution(df):
-    '''
-    generates word clouds for the top 20 most frequently used words in each language.
-    '''
-    plt.figure(figsize=(10, 6))
-    sns.countplot(y='language', data=df, order=df['language'].value_counts().index, color='skyblue')
-    plt.title('Distribution of Languages')
-    plt.xlabel('Count')
-    plt.ylabel('Language')
-    plt.show()
-
-
-def generate_language_wordclouds(df):
-    # Group the DataFrame by the 'language' column and join all the readme files for each language into a single string
-    grouped = df.groupby('language')['readme'].apply(' '.join).reset_index()
-
-    # Initialize a CountVectorizer
-    cv = CountVectorizer(stop_words='english')
-
-    # Ccreate a word cloud of the top 20 most frequently used words, for each language in df
-    for i, row in grouped.iterrows():
-        # Count the frequency of each word in the readme files for the current language
-        word_count = cv.fit_transform([row['readme']])
-        words = cv.get_feature_names_out()
-        word_freq = word_count.toarray().sum(axis=0)
-        word_freq_dict = dict(zip(words, word_freq))
-
-        # Get the top 20 most frequently used words and their frequencies
-        top_words = sorted(word_freq_dict.items(), key=lambda x: x[1], reverse=True)[:20]
-        top_words_dict = dict(top_words)
-
-        # Create a word cloud
-        wc = WordCloud(width=800, height=400, max_words=20, background_color='white').generate_from_frequencies(top_words_dict)
-
-        # Display the word cloud
-        plt.figure(figsize=(10, 5))
-        plt.imshow(wc, interpolation='bilinear')
-        plt.axis('off')
-        plt.title(f"Top 20 Words for {row['language']}")
-        plt.show()
-
+    #combine into df to see all words and languages together
+    word_counts_products = (pd.concat([all_freq, credit_report_freq, debt_freq, credit_card_freq, mortgage_freq, loans_freq, bank_freq, money_service_freq], axis=1, sort=True)
+                .set_axis(['all', 'credit_report', 'debt', 'credit_card', 'mortgage', 'loans', 'bank', 'money_service'], axis=1)
+                .fillna(0)
+                .apply(lambda s: s.astype(int)))
+    
+    print(f"Total Unique Words Found per Product: {word_counts_products.shape[0]}")
+    print()
+    
+    return word_counts_products
+    
 def calculate_average_letter_count(df):
     # Calculate the letter count for each row
     df['letter_count'] = df['readme'].apply(lambda x: len(x))
