@@ -134,7 +134,7 @@ def get_words_products(train):
     
     return word_counts_products
 
-def analyze_sentiment(alpha=0.05,truncate=False):
+def analyze_sentiment(train,alpha=0.05,truncate=False):
     """Analyzes sentiment and company response to consumer across product bins.
     This function answers the question: Do narratives with a neutral or positive sentiment
     analysis relating to bank account products lead to a response of closed with monetary relief?"""
