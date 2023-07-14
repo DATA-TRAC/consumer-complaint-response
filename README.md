@@ -68,6 +68,8 @@
   * **complaint_id**
     * 0% nulls
 <br>
+
+---
 * **<span style="color:green">Cleaned Columns</span>**
   * **date_received**
     * 0% nulls
@@ -93,15 +95,15 @@
 
 ### Post Cleaning Inspection
 
-1246736 rows x 8 columns
+* 1246736 rows x 8 columns
 
-Used NLTK to clean each document resulting in:
-* 2 new columns: *clean* (removes redacted XXs, and stopwords removed) and *lemon* (lemmatized)
+* Used NLTK to clean each document resulting in:
+    * 2 new columns: *clean* (removes redacted XXs, and stopwords removed) and *lemon* (lemmatized)
     <br>
     <br>
     
-Selected columns to proceed with after cleaning:
-* date_received, product_bins, company_name, state, tags, company_response_to_customer (target), clean, lemon
+* Selected columns to proceed with after cleaning:
+    * date_received, product_bins, company_name, state, tags, company_response_to_customer (target), clean, lemon
 
 ---
 
@@ -126,6 +128,7 @@ Selected columns to proceed with after cleaning:
 
 
 **SECOND ITERATION QUESTIONS**
+<br>
 
 5. Is there a relationship/bias for servicemember tags in relation to company response?
       * good but it's better after MVP
@@ -209,6 +212,7 @@ Selected columns to proceed with after cleaning:
     * This will use a pre-built and cleaned parquet file
 <br>
 <br>
+
 * **For the longer run: ⚠️WARNING⚠️:** These are almost the same steps we took to originally acquire the data. The steps take a lot of time (and space) and may not even be the best way of doing it. We highly recommend doing the quick run above unless you want to know how we got the data.
     * Verify `import big_wrangle as w` is in the imports section
     * Install the pandas-gbq package
