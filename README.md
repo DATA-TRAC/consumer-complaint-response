@@ -22,126 +22,110 @@
 
 ### Prepare
 
-* date_received
-  * changed date to DateTime
-  * no nulls
-  * 2015 to 2023
-* product
-  * no nulls
-  * credit related
-  * *ENGINEERED FEATURE*
-    * **bin related products/services together**
-        * bins = credit_report, credit_card, debt_collection, mortgage, bank, loans, and money_service
-    * **drop after engineering**
-* subproduct
-  * 7% null
-  * top value = credit reporting
-  * fill nulls with the product
-  * what does subproduct correlate with?
-    * **drop column**
-* issue
-  * no nulls
-  * 165 unique values
-  * concat into consumer_complaint_narrative column to address those nulls and then drop the issue
-    * **drop column**
-* subissue
-  * 20% null
-  * 221 unique
-    * **drop column**
-* consumer_complaint_narrative
-  * 64% null
-  * renamed to narrative
-     * **drop null values**
-     *  **column dropped after nltk language cleaning**
-* company_public_response
-  * 56% null
-    * **drop column**
-* company_name
-  * no nulls
-  * 6,694 Companies
-    * **16 SVB complaints -- *can possibly add as an end project application/impact to identify fraudulent activity or discrimination based on customer complaints***
-    * **SPICY**
-* State
-  * 1% null
-  * based on per capita, population, and state size...
-  * keep for purposes of exploration
-  * do not bin (causes manipulation)
-    * **bin 1% null into UNKNOWN labeling**
-* zip code
-  * 1% null
-  * located a string buried in the data
-    * **use re to clean**
-    * **drop for MVP: nice-to-have for second iteration**
-* tags
-  * 89% null
-  * domain knowledge: 62 and older accounted for senior - pulled straight from the source
-    * **impute nulls with "Average Person**
-* consumer_consent_provided
-  * does not relate to the target
-    * **drop column**
-* submitted_via
-  * no nulls
-    * **drop column**
-* date_sent_to_company
-  * no nulls
-    * **drop column**
-* company_response_to_consumer
-  * 4 nulls = 0%
-    * **Drop these 4 rows because this is the target column**
-  * 8 unique values
-    * **Investigate the difference between closed without relief and closed with relief**
-    * **NICE_TO_HAVE: applying the model to in_progress complaints and see what it predicts based on the language**
-    * **Drop 'in progress' response because there is no conclusion**
-  * 7 unique values
-* timely_response
-  * no nulls
-  * boolean
-    * **drop column**
-* consumer_disputed
-  * 77% null
-    * **drop column**
-* complaint_id
-  * no nulls
-    * **drop for MVP: nice-to-have for second iteration**
-* Used NLTK to clean each document resulting in:
-  * 2 new columns: clean (removes redacted XXs, and stopwords removed) and lemon (lemmatized).
-
+* **<span style="color:red">Dropped Columns</span>**
+  * **product**
+    * 0% nulls
+    * *<span style="color:orange">ENGINEERED FEATURE</span>*
+    * **<span style="color:orange">bin related products/services together then drop</span>**
+        * <span style="color:orange">bins = credit_report, credit_card, debt_collection, mortgage, bank, loans, and money_service</span>
+  * **subproduct**
+    * 7% null
+  * **issue**
+    * 0% nulls
+    * 165 unique values
+    * **<span style="color:blue">future iteration</span>**
+  * **subissue**
+    * 20% null
+    * 221 unique
+  * **consumer_complaint_narrative**
+    * 64% null
+    * renamed to narrative
+      * **<span style="color:orange">drop all null values</span>**
+      * **<span style="color:orange">drop after NLTK cleaning</span>**
+  * **company_public_response**
+    * 56% null
+    * related to target
+  * **zip code**
+    * 1% null
+    * mixed data types
+      * **<span style="color:blue">future iteration</span>**
+  * **consumer_consent_provided**
+    * 25% null
+    * does not relate to the target
+  * **submitted_via**
+    * 0% nulls
+    * does not relate to the target
+  * **date_sent_to_company**
+    * 0% nulls
+      * **<span style="color:blue">future iteration</span>**
+  * **timely_response**
+    * 0% nulls
+    * boolean
+      * **<span style="color:blue">future iteration</span>**
+  * **consumer_disputed**
+    * 77% null
+      * **<span style="color:blue">future iteration</span>**
+  * **complaint_id**
+    * 0% nulls
+<br>
+* **<span style="color:green">Cleaned Columns</span>**
+  * **date_received**
+    * 0% nulls
+    * changed date to DateTime
+  * **company_name**
+    * 0% nulls
+    * 6,694 Companies
+  * **state**
+    * 1% null
+    * keep for purposes of exploration
+      * **<span style="color:orange">impute 1% null into UNKNOWN label</span>**
+  * **tags**
+    * 89% null
+        * **<span style="color:orange">impute nulls with "Average Person label</span>**
+  * **company_response_to_consumer**
+    * Target
+    * 4 nulls = 0%
+      * **<span style="color:orange">drop these 4 rows because this is the target column</span>**
+    * 8 initial unique values
+      * **<span style="color:blue">nice to have: apply the model to in_progress complaints and see what it predicts based on the language</span>**
+      * **<span style="color:orange">drop 'in progress' response because there is no conclusion</span>**
 ---
 
 ### Post Cleaning Inspection
 
-* 1246736 rows x 8 columns
-  * date_received, product_bins, company_name, state, tags, company_response_to_customer (target), clean, lemon
+1246736 rows x 8 columns
+
+Used NLTK to clean each document resulting in:
+* 2 new columns: *clean* (removes redacted XXs, and stopwords removed) and *lemon* (lemmatized)
+    <br>
+    <br>
+    
+Selected columns to proceed with after cleaning:
+* date_received, product_bins, company_name, state, tags, company_response_to_customer (target), clean, lemon
 
 ---
 
 ### Explore
 
-* Questions:
+**1. Are there words that get particular responses and is there a relationship?**
+* What are the payout words that got a company response of closed with monetary relief?
+* Are there unique words associated with products? Is there a relationship between unique product words and responses?
+<br>
 
+**2. Do all responses have a negative sentiment?**
+* Do narratives with a neutral or positive sentiment analysis relating to bank account products lead to a response of closed with monetary relief?
+<br>
 
-1. Do specific issues tend to receive particular responses? For example, do fraud-related issues tend to receive more "closed with relief" responses compared to other issues?
-      a. What are the payout words that got a company response of closed with monetary relief?
-      b. Is there a relationship between consumer complaints and company response?
-      * Its a keep - we just need to word the question better
-      * New Question to 1
-        - Is there a relationship between consumer complaint words and company response?
-                a. Are there unique words associated with each product, and is there a relationship between unique product words and possible response from the company?
-                or 
-                Is there a relationship between consumer complaint words and company response?"
-                
-3. Do narratives with a neutral or positive sentiment analysis relating to bank account products lead to a response of closed 
-   with monetary relief?
-      * good with stats
-      
-4. Are there unique words associated with the most negative and most positive company responses?
-      * good - its a keep
+**3. Are there unique words associated with the most negative and most positive company responses?**
+<br>
 
-8. Which product is more likely to have monetary relief?
-      * is an association to question 4 - its a keep
+**4. Which product is more likely to have monetary relief?**
       
       
 *****************************************    
+
+
+**SECOND ITERATION QUESTIONS**
 
 5. Is there a relationship/bias for servicemember tags in relation to company response?
       * good but it's better after MVP
@@ -158,7 +142,6 @@
       * not useful for modeling - OUT
                 
                 
-    
 ## Data Dictionary
 
 | Feature                               | Definition                                                                                  |
@@ -181,7 +164,9 @@
 | timely_response                       | Indicates whether the company gave a timely response or not                                 |
 | consumer_disputed                     | Whether the consumer disputed the company's response                                        |
 | complaint_id                          | Unique ID for complaints registered with the CFPB                                           |
-
+| product_bins                          | Engineered Feature: bin related products together                                           |
+| clean                                 | Engineered Feature: tokenized, numbers/specials, and XX's removed                           |
+| lemon                                 | Engineered Feature: clean column PLUS lemmatization                                         |
 
 
 ## Model
@@ -217,6 +202,31 @@
      * Try to run again if it stopped for authentication
    * This will run through the longer pathway of getting the datasets from the source and merging/cleaning/prep
      * It will probably take a while (millions of rows, +2GB), hence I do not recommend
+
+* **Quick run**
+    * Verify `import wrangle as w` is in the imports section 
+    * Run final report
+    * This will use a pre-built and cleaned parquet file
+<br>
+<br>
+* **For the longer run: ⚠️WARNING⚠️:** These are almost the same steps we took to originally acquire the data. The steps take a lot of time (and space) and may not even be the best way of doing it. We highly recommend doing the quick run above unless you want to know how we got the data.
+    * Verify `import big_wrangle as w` is in the imports section
+    * Install the pandas-gbq package
+        * `pip install pandas-gbq`
+    * Go to Google BigQuery and create a project
+    * Copy the `'long-SQL queries found in big_wrangle.py`
+        * Run in [Google BigQuery](https://cloud.google.com/bigquery/public-data)
+    * Click on 'Go to Datasets in Cloud Marketplace' and search for 'CFPB'
+        * View the dataset to open a quick SQL prompt to query in
+    * Save each result as a BigQuery table in your project
+    * You can look in `big_wrangle.py for what we named our project, database, and tables`
+    * Edit and save the `'small-SQL query variables found in big_wrangle.py` to the respective table names in your BigQuery project using this format: 
+        * ***FROM 'database. table' and edit the 'project_ID' variable to your project's ID***
+    * Run final report
+    * It may ask for authentication when it tries to query Google BigQuery
+        * Try to run again if it stopped
+    * This will run through the longer pathway of getting the datasets from the source and merging/cleaning/prep
+    * It will probably take a while **(3+ millions of rows, +2GB)**
 
 ---
 
