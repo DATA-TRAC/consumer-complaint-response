@@ -100,21 +100,21 @@ def make_tfidf(Xtr,Xv,Xt):
 
 def tree_models(Xtr,ytr,Xv,yv):
     metrics = []
-    # cycle through depth,leaf,class_weight for dec tree
-    for d,l,cw in itertools.combinations(range(1,21),range(1,21),['balanced',None]):
+# cycle through depth, leaf, class_weight for dec tree
+    for d, l, cw in itertools.product(range(1, 21), range(1, 21), ['balanced', None]):
         # decision tree
-        tree = DecisionTreeClassifier(max_depth=d, min_samples_leaf=l,class_weight=cw,random_state=123)
-        tree.fit(Xtr,ytr)
+        tree = DecisionTreeClassifier(max_depth=d, min_samples_leaf=l, class_weight=cw, random_state=123)
+        tree.fit(Xtr, ytr)
         # accuracies
-        ytr_acc = tree.score(Xtr,ytr)
-        yv_acc = tree.score(Xv,yv)
+        ytr_acc = tree.score(Xtr, ytr)
+        yv_acc = tree.score(Xv, yv)
         # table-ize
-        output ={
-                'model':'Decision Tree',
-                'params':f"max_depth={d},min_samples_leaf={l},class_weight={cw},random_state=123",
-                'tr_acc':ytr_acc,
-                'v_acc':yv_acc,
-            }
+        output = {
+            'model': 'Decision Tree',
+            'params': f"max_depth={d}, min_samples_leaf={l}, class_weight={cw}, random_state=123",
+            'tr_acc': ytr_acc,
+            'v_acc': yv_acc,
+        }
         metrics.append(output)
     return pd.DataFrame(metrics)
 
