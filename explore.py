@@ -311,3 +311,69 @@ def monetary_product(train):
                 ylabel='Product Type');
 
 
+# ------------------------Question 1 - Lugo ----------------------------------------
+def get_word_counts(train):
+    """
+    
+    """
+    from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+    
+    # Initialize a CountVectorizer (or TfidfVectorizer)
+    vectorizer = CountVectorizer(max_features=20000)
+
+    # Fit the vectorizer to the 'lemon' column and transform the column into a matrix
+    word_matrix = vectorizer.fit_transform(train['lemon'])
+
+    # Convert the sparse matrix to a DataFrame
+    words_df = pd.DataFrame.sparse.from_spmatrix(word_matrix, columns=vectorizer.get_feature_names_out())
+
+    # merge the word DataFrame with the 'company_response_to_consumer' column
+    df_with_words = words_df.merge(train['company_response_to_consumer'], left_index=True, right_index=True)
+
+    # For each response type, count the frequency of each word
+    word_counts = df_with_words.groupby('company_response_to_consumer').sum()
+
+    # Filter out columns (axis=1) where all values are zero
+    word_counts_ones = word_counts.loc[:, word_counts.any(axis=0)]
+    
+    return word_counts, df_with_words,word_counts_ones
+# ----------------------------continuation of Q1-------------------------------------------
+def top_15_words(word_counts_ones):
+    # Define the responses
+    responses = ['Closed with explanation', 'Closed', 'Closed with monetary relief', 'Closed with non-monetary relief', 'Untimely response']
+
+    # Initialize an empty DataFrame to store the results
+    top_words_df = pd.DataFrame()
+
+    # Loop over the responses
+    for response in responses:
+        # Get the 10 words that appear most frequently in narratives associated with the current response
+        top_words = word_counts_ones.loc[response].nlargest(15)
+
+        # Convert the Series to a DataFrame and transpose it
+        top_words_df_temp = pd.DataFrame(top_words).transpose()
+
+        # Append the temporary DataFrame to the main DataFrame
+        top_words_df = pd.concat([top_words_df, top_words_df_temp])
+
+    # Set the index of the DataFrame to the responses
+    top_words_df.index = responses
+    return top_words_df
+# ----------------------------continuation of Q1-------------------------------------------
+def frequenct_words_plot(df_with_words,word_counts_ones):
+    # Get the unique response types
+    response_types = df_with_words['company_response_to_consumer'].unique()
+
+    # For each response type
+    for response in response_types:
+        # Get the top 10 words
+        top_words = word_counts_ones.loc[response].nlargest(10)
+
+        # Create a bar plot
+        plt.figure(figsize=(10, 5))
+        plt.bar(top_words.index, top_words.values)
+        plt.title(f'Top 10 words for "{response}" response')
+        plt.xlabel('Words')
+        plt.ylabel('Frequency')
+    return plt.show()
+# --------------------------------end of Q1--------------------------------------------------
