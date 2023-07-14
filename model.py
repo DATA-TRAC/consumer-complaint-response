@@ -213,7 +213,7 @@ def comp_nb_models(Xtr,ytr,Xv,yv):
 
 def multi_nb_models(Xtr,ytr,Xv,yv):
     # naive bayes multinomial
-    mnb = MultinomialNB(alpha=0,force_alpha=True)
+    mnb = MultinomialNB(alpha=0)
     mnb.fit(Xtr,ytr)
     # accuracies
     ytr_acc = mnb.score(Xtr,ytr)
