@@ -12,19 +12,21 @@
 
 import pandas as pd
 import numpy as np
+import itertools
 from sklearn.model_selection import GridSearchCV
-from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
-from sklearn.naive_bayes import MultinomialNB
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.naive_bayes import MultinomialNB, ComplementNB, CategoricalNB
 from sklearn.metrics import accuracy_score
 import matplotlib.pyplot as plt
 import nltk
 import nltk.sentiment
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 
 #feature importance
-from sklearn.feature_selection import SelectKBest
-from sklearn.feature_selection import chi2
+from sklearn.feature_selection import SelectKBest, chi2, mutual_info_classif
 
 
 
@@ -53,12 +55,12 @@ def make_cv(Xtr,Xv,Xt):
     :return: three dataframes: Xtr_cv, Xv_cv, and Xt_cv.
     """
     #make my bag of words up to trigrams cv and keep single characters
-    cv = CountVectorizer(ngram_range=(1,3),token_pattern=r'(?u)\b\w+\b')
+    cv = CountVectorizer(token_pattern=r'(?u)\b\w+\b', max_features=2900)
     # fit and transform train
-    Xtr_bow_cv = cv.fit_transform(Xtr.lemmatized)
+    Xtr_bow_cv = cv.fit_transform(Xtr.lemon)
     # transform val and test
-    Xv_bow_cv = cv.transform(Xv.lemmatized)
-    Xt_bow_cv = cv.transform(Xt.lemmatized)
+    Xv_bow_cv = cv.transform(Xv.lemon)
+    Xt_bow_cv = cv.transform(Xt.lemon)
     # make dfs
     Xtr_cv = pd.DataFrame(Xtr_bow_cv.todense(),columns=cv.get_feature_names_out(),index=Xtr.index)
     Xv_cv = pd.DataFrame(Xv_bow_cv.todense(),columns=cv.get_feature_names_out(),index=Xv.index)
@@ -82,12 +84,12 @@ def make_tfidf(Xtr,Xv,Xt):
     :return: three dataframes: Xtr_tfidf, Xv_tfidf, and Xt_tfidf.
     """
     #make my bag of words up to trigrams tfidf and keep single characters
-    tfidf = TfidfVectorizer(ngram_range=(1,3),token_pattern=r'(?u)\b\w+\b')
+    tfidf = TfidfVectorizer(token_pattern=r'(?u)\b\w+\b', max_features=2900)
     # fit and transform train
-    Xtr_bow_tfidf = tfidf.fit_transform(Xtr.lemmatized)
+    Xtr_bow_tfidf = tfidf.fit_transform(Xtr.lemon)
     # transform val and test
-    Xv_bow_tfidf = tfidf.transform(Xv.lemmatized)
-    Xt_bow_tfidf = tfidf.transform(Xt.lemmatized)
+    Xv_bow_tfidf = tfidf.transform(Xv.lemon)
+    Xt_bow_tfidf = tfidf.transform(Xt.lemon)
     # make dfs
     Xtr_tfidf = pd.DataFrame(Xtr_bow_tfidf.todense(),columns=tfidf.get_feature_names_out(),index=Xtr.index)
     Xv_tfidf = pd.DataFrame(Xv_bow_tfidf.todense(),columns=tfidf.get_feature_names_out(),index=Xv.index)
@@ -96,37 +98,72 @@ def make_tfidf(Xtr,Xv,Xt):
 
 
 
+def tree_models(Xtr,ytr,Xv,yv):
+    metrics = []
+    # cycle through depth,leaf,class_weight for dec tree
+    for d,l,cw in itertools.combinations(range(1,21),range(1,21),['balanced',None]):
+        # decision tree
+        tree = DecisionTreeClassifier(max_depth=d, min_samples_leaf=l,class_weight=cw,random_state=123)
+        tree.fit(Xtr,ytr)
+        # accuracies
+        ytr_acc = tree.score(Xtr,ytr)
+        yv_acc = tree.score(Xv,yv)
+        # table-ize
+        output ={
+                'model':'Decision Tree',
+                'params':f"max_depth={d},min_samples_leaf={l},class_weight={cw},random_state=123",
+                'tr_acc':ytr_acc,
+                'v_acc':yv_acc,
+            }
+        metrics.append(output)
+    return pd.DataFrame(metrics)
 
-def class_models(Xtr,ytr,Xv,yv):
-    """
-    The function `class_models` trains and evaluates different classification models (Logistic
-    Regression, Complement Naive Bayes, and Multinomial Naive Bayes) on the given training and
-    validation data, and returns a dataframe containing the model names, parameters, training accuracy,
-    and validation accuracy for each model.
-    
-    :param Xtr: The training data features (X) for the classification models
-    :param ytr: The training labels for the classification model
-    :param Xv: Xv is the feature matrix for the validation set. It contains the input features for each
-    instance in the validation set
-    :param yv: The parameter `yv` represents the target variable for the validation set. It is the true
-    labels or classes for the validation set data
-    :return: a pandas DataFrame containing the metrics for different models and their corresponding
-    parameters. The metrics include the model name, parameters, training accuracy, and validation
-    accuracy.
-    """
-    # baseline as mean
-    pred_mean = ytr.value_counts(normalize=True)[0]
-    output = {
-            'model':'bl',
-            'params':'None',
-            'tr_acc':pred_mean,
-            'v_acc':'?',
-        }
-    metrics = [output]
+def forest_models(Xtr,ytr,Xv,yv):
+    metrics = []
+    # cycle through depth,leaf,class_weight for random forest
+    for d,l,cw in itertools.combinations(range(1,21),range(1,21),['balanced','balanced_subsample',None]):
+        # random forest
+        forest = RandomForestClassifier(max_depth=d, min_samples_leaf=l,class_weight=cw,random_state=123)
+        forest.fit(Xtr,ytr)
+        # accuracies
+        ytr_acc = forest.score(Xtr,ytr)
+        yv_acc = forest.score(Xv,yv)
+        # table-ize
+        output ={
+                'model':'Random Forest',
+                'params':f"max_depth={d},min_samples_leaf={l},class_weight={cw},random_state=123",
+                'tr_acc':ytr_acc,
+                'v_acc':yv_acc,
+            }
+        metrics.append(output)
+    return pd.DataFrame(metrics)
+
+def knn_models(Xtr,ytr,Xv,yv):
+    metrics = []
+    # cycle through neighbors and weights for knn
+    for n,w in itertools.combinations(range(1,21),['uniform', 'distance']):
+        # knn
+        forest = KNeighborsClassifier(n_neighbors=n,weights=w)
+        forest.fit(Xtr,ytr)
+        # accuracies
+        ytr_acc = forest.score(Xtr,ytr)
+        yv_acc = forest.score(Xv,yv)
+        # table-ize
+        output ={
+                'model':'KNN',
+                'params':f"n_neighbors={n},weights={w}",
+                'tr_acc':ytr_acc,
+                'v_acc':yv_acc,
+            }
+        metrics.append(output)
+    return pd.DataFrame(metrics)
+
+def log_models(Xtr,ytr,Xv,yv):
+    metrics = []
     # cycle through C,class_weight for log reg
-    for c in [.01,.1,1,10,100,1000]:
+    for c,cw in itertools.combinations([.01,.1,1,10,100,1000],['balanced',None]):
         # logistic regression
-        lr = LogisticRegression(C=c,class_weight='balanced',random_state=42,max_iter=500)
+        lr = LogisticRegression(C=c,class_weight=cw,random_state=123,max_iter=500)
         lr.fit(Xtr,ytr)
         # accuracies
         ytr_acc = lr.score(Xtr,ytr)
@@ -134,15 +171,32 @@ def class_models(Xtr,ytr,Xv,yv):
         # table-ize
         output ={
                 'model':'LogReg',
-                'params':f"C={c},class_weight='balanced',max_iter=500",
+                'params':f"C={c},class_weight={cw},random_state=123,max_iter=500",
                 'tr_acc':ytr_acc,
                 'v_acc':yv_acc,
             }
         metrics.append(output)
+    return pd.DataFrame(metrics)
+
+def comp_nb_models(Xtr,ytr,Xv,yv):
+    # naive bayes complement
+    cnb = ComplementNB(alpha=0,force_alpha=True)
+    cnb.fit(Xtr,ytr)
+    # accuracies
+    ytr_acc = cnb.score(Xtr,ytr)
+    yv_acc = cnb.score(Xv,yv)
+    # table-ize
+    output ={
+            'model':'CNB',
+            'params':f'alpha={a},force_alpha=True',
+            'tr_acc':ytr_acc,
+            'v_acc':yv_acc,
+        }
+    metrics = [output]
     # cycle through alpha for CNB
     for a in np.arange(.1,.6,.1):
         # naive bayes complement
-        cnb = nb.ComplementNB(alpha=a)
+        cnb = ComplementNB(alpha=a)
         cnb.fit(Xtr,ytr)
         # accuracies
         ytr_acc = cnb.score(Xtr,ytr)
@@ -155,11 +209,27 @@ def class_models(Xtr,ytr,Xv,yv):
                 'v_acc':yv_acc,
             }
         metrics.append(output)
-    metrics_df = pd.DataFrame(metrics)
+    return pd.DataFrame(metrics)
+
+def multi_nb_models(Xtr,ytr,Xv,yv):
+    # naive bayes multinomial
+    mnb = MultinomialNB(alpha=0,force_alpha=True)
+    mnb.fit(Xtr,ytr)
+    # accuracies
+    ytr_acc = mnb.score(Xtr,ytr)
+    yv_acc = mnb.score(Xv,yv)
+    # table-ize
+    output ={
+            'model':'MNB',
+            'params':f'alpha={a},force_alpha=True',
+            'tr_acc':ytr_acc,
+            'v_acc':yv_acc,
+        }
+    metrics = [output]
     # cycle through alpha for MNB
     for a in np.arange(.1,.6,.1):
         # naive bayes multinomial
-        mnb = nb.MultinomialNB(alpha=a)
+        mnb = MultinomialNB(alpha=a)
         mnb.fit(Xtr,ytr)
         # accuracies
         ytr_acc = mnb.score(Xtr,ytr)
@@ -172,25 +242,65 @@ def class_models(Xtr,ytr,Xv,yv):
                 'v_acc':yv_acc,
             }
         metrics.append(output)
-    metrics_df = pd.DataFrame(metrics)
-    return metrics_df
+    return pd.DataFrame(metrics)
+
+def cat_nb_models(Xtr,ytr,Xv,yv):
+    # naive bayes categorical
+    cat = CategoricalNB(alpha=0,force_alpha=True)
+    cat.fit(Xtr,ytr)
+    # accuracies
+    ytr_acc = cat.score(Xtr,ytr)
+    yv_acc = cat.score(Xv,yv)
+    # table-ize
+    output ={
+            'model':'CatNB',
+            'params':f'alpha={a},force_alpha=True',
+            'tr_acc':ytr_acc,
+            'v_acc':yv_acc,
+        }
+    metrics = [output]
+    # cycle through alpha for CatNB
+    for a in np.arange(.1,.6,.1):
+        # naive bayes categorical
+        cat = CategoricalNB(alpha=a)
+        cat.fit(Xtr,ytr)
+        # accuracies
+        ytr_acc = cat.score(Xtr,ytr)
+        yv_acc = cat.score(Xv,yv)
+        # table-ize
+        output ={
+                'model':'CatNB',
+                'params':f'alpha={a}',
+                'tr_acc':ytr_acc,
+                'v_acc':yv_acc,
+            }
+        metrics.append(output)
+    return pd.DataFrame(metrics)
 
 
+def encode(df):
+    '''Encode categorical columns'''
+    # columns to encode
+    cols = ['tags','product_bins']
+    # encode the dummies
+    dummy = pd.get_dummies(df[cols],prefix='',prefix_sep='',drop_first=True)
+    # bring the dummies along
+    return pd.concat([df,dummy],axis=1)
 
 
-
-def select_kbest(X, y, k=2):
+def select_kbest(X, y, k=2, scoring=chi2):
     '''
     will take in two pandas objects:
     X: a dataframe representing numerical independent features
     y: a pandas Series representing a target variable
     k: a keyword argument defaulted to 2 for the number of ideal features we elect to select
+    scoring: scoring type, default chi2, other category mutual_info_classif
     ---
     return: a df of the selected features from the SelectKBest process
     ---
     Format: kbest_results = function()
     '''
-    kbest = SelectKBest(chi2, k=k)
+    kbest = SelectKBest(scoring, k=k)
     kbest.fit(X, y)
     mask = kbest.get_support()
     kbest_results = pd.DataFrame(
