@@ -18,7 +18,7 @@
 ### Acquire
 
 * Data acquired from [Google BigQuery](https://console.cloud.google.com/marketplace/product/cfpb/complaint-database)
-* 3458906 rows × 18 columns *before* cleaning
+* 3,458,906 rows × 18 columns *before* cleaning
 
 ### Prepare
 
@@ -95,7 +95,7 @@
 
 ### Post Cleaning Inspection
 
-* 1246736 rows x 8 columns
+* 1,246,736 rows x 8 columns
 
 * Used NLTK to clean each document resulting in:
     * 2 new columns: *clean* (removes redacted XXs, and stopwords removed) and *lemon* (lemmatized)
