@@ -1,6 +1,14 @@
-# #module
-# import stats_conclude as sc
+'''
+*------------------*
+|                  |
+|     EXPLORE!     |
+|                  |
+*------------------*
+'''
 
+
+
+#------------------------------------------------------------- IMPORTS  -------------------------------------------------------------
 #standard imports
 import pandas as pd
 import numpy as np
@@ -17,6 +25,14 @@ from sklearn.feature_extraction.text import CountVectorizer
 import matplotlib.pyplot as plt
 import seaborn as sns
 import wrangle as w
+
+'''
+*------------------*
+|                  |
+|     FUNCTIONS    |
+|                  |
+*------------------*
+'''
 
 # -----------------------------------------------------------------EXPLORE-----------------------------------------------------------------
 
@@ -311,10 +327,18 @@ def monetary_product(train):
                 ylabel='Product Type');
 
 
-# ------------------------Question 1 - Lugo ----------------------------------------
 def get_word_counts(train):
     """
-    
+    Question 1 - Lugo 
+    Calculates the word counts for each response type in the given training data.
+
+    Parameters:
+        train (DataFrame): The training data containing the 'lemon' and 'company_response_to_consumer' columns.
+
+    Returns:
+        word_counts (DataFrame): A DataFrame that shows the frequency of each word for each response type.
+        df_with_words (DataFrame): The original DataFrame merged with the word DataFrame.
+        word_counts_ones (DataFrame): A filtered version of word_counts, excluding columns with all zero values.
     """
     from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
     
@@ -337,8 +361,17 @@ def get_word_counts(train):
     word_counts_ones = word_counts.loc[:, word_counts.any(axis=0)]
     
     return word_counts, df_with_words,word_counts_ones
-# ----------------------------continuation of Q1-------------------------------------------
 def top_15_words(word_counts_ones):
+    """
+    continuation of Q1
+    Retrieves the top 15 most frequently occurring words for each response type from the given word counts DataFrame.
+
+    Parameters:
+        word_counts_ones (DataFrame): The word counts DataFrame, filtered to exclude columns with all zero values.
+
+    Returns:
+        top_words_df (DataFrame): A DataFrame containing the top 15 words for each response type, indexed by the response types.
+    """
     # Define the responses
     responses = ['Closed with explanation', 'Closed', 'Closed with monetary relief', 'Closed with non-monetary relief', 'Untimely response']
 
@@ -359,8 +392,18 @@ def top_15_words(word_counts_ones):
     # Set the index of the DataFrame to the responses
     top_words_df.index = responses
     return top_words_df
-# ----------------------------continuation of Q1-------------------------------------------
 def frequenct_words_plot(df_with_words,word_counts_ones):
+    """
+    Continuation of Q1
+    Creates a bar plot to visualize the top 10 most frequently occurring words for each response type.
+
+    Parameters:
+        df_with_words (DataFrame): The DataFrame merged with the word DataFrame.
+        word_counts_ones (DataFrame): The filtered word counts DataFrame.
+
+    Returns:
+        None (displays the plot)
+    """
     # Get the unique response types
     response_types = df_with_words['company_response_to_consumer'].unique()
 
@@ -376,4 +419,3 @@ def frequenct_words_plot(df_with_words,word_counts_ones):
         plt.xlabel('Words')
         plt.ylabel('Frequency')
     return plt.show()
-# --------------------------------end of Q1--------------------------------------------------

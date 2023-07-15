@@ -1,14 +1,12 @@
-# IMPORTS
-
 '''
 *------------------*
 |                  |
-|     MODELING     |
+|     MODEL!       |
 |                  |
 *------------------*
 '''
 
-##### IMPORTS #####
+#------------------------------------------------------------- IMPORTS  -------------------------------------------------------------
 
 import pandas as pd
 import numpy as np
@@ -38,6 +36,7 @@ from sklearn.feature_selection import SelectKBest, chi2, mutual_info_classif
 *------------------*
 """
 
+#-------------------------------------------------------------VECTORIZERS -------------------------------------------------------------
 
 def make_cv(Xtr,Xv,Xt):
     """
@@ -97,8 +96,21 @@ def make_tfidf(Xtr,Xv,Xt):
     return Xtr_tfidf,Xv_tfidf,Xt_tfidf
 
 
+#------------------------------------------------------------- MODELING-------------------------------------------------------------
 
 def tree_models(Xtr,ytr,Xv,yv):
+    """
+    Trains and evaluates decision tree models with different parameter combinations and returns the performance metrics.
+
+    Parameters:
+        Xtr (array-like): Training features.
+        ytr (array-like): Training labels.
+        Xv (array-like): Validation features.
+        yv (array-like): Validation labels.
+
+    Returns:
+        metrics (DataFrame): A DataFrame containing performance metrics for different decision tree models.
+    """
     metrics = []
 # cycle through depth, leaf, class_weight for dec tree
     for d, l, cw in itertools.product(range(1, 21), range(1, 21), ['balanced', None]):
@@ -119,6 +131,18 @@ def tree_models(Xtr,ytr,Xv,yv):
     return pd.DataFrame(metrics)
 
 def forest_models(Xtr,ytr,Xv,yv):
+    """
+    Trains and evaluates random forest models with different parameter combinations and returns the performance metrics.
+
+    Parameters:
+        Xtr (array-like): Training features.
+        ytr (array-like): Training labels.
+        Xv (array-like): Validation features.
+        yv (array-like): Validation labels.
+
+    Returns:
+        metrics (DataFrame): A DataFrame containing performance metrics for different random forest models.
+    """
     metrics = []
     # cycle through depth,leaf,class_weight for random forest
     for d,l,cw in itertools.combinations(range(1,21),range(1,21),['balanced','balanced_subsample',None]):
@@ -139,6 +163,18 @@ def forest_models(Xtr,ytr,Xv,yv):
     return pd.DataFrame(metrics)
 
 def knn_models(Xtr,ytr,Xv,yv):
+    """
+    Trains and evaluates k-nearest neighbors (KNN) models with different parameter combinations and returns the performance metrics.
+
+    Parameters:
+        Xtr (array-like): Training features.
+        ytr (array-like): Training labels.
+        Xv (array-like): Validation features.
+        yv (array-like): Validation labels.
+
+    Returns:
+        metrics (DataFrame): A DataFrame containing performance metrics for different KNN models.
+    """
     metrics = []
     # cycle through neighbors and weights for knn
     for n,w in itertools.combinations(range(1,21),['uniform', 'distance']):
@@ -159,6 +195,18 @@ def knn_models(Xtr,ytr,Xv,yv):
     return pd.DataFrame(metrics)
 
 def log_models(Xtr,ytr,Xv,yv):
+    """
+    Trains and evaluates logistic regression models with different parameter combinations and returns the performance metrics.
+
+    Parameters:
+        Xtr (array-like): Training features.
+        ytr (array-like): Training labels.
+        Xv (array-like): Validation features.
+        yv (array-like): Validation labels.
+
+    Returns:
+        metrics (DataFrame): A DataFrame containing performance metrics for different logistic regression models.
+    """
     metrics = []
     # cycle through C,class_weight for log reg
     for c,cw in itertools.combinations([.01,.1,1,10,100,1000],['balanced',None]):
@@ -179,6 +227,18 @@ def log_models(Xtr,ytr,Xv,yv):
     return pd.DataFrame(metrics)
 
 def comp_nb_models(Xtr,ytr,Xv,yv):
+    """
+    Trains and evaluates Complement Naive Bayes models with different parameter combinations and returns the performance metrics.
+
+    Parameters:
+        Xtr (array-like): Training features.
+        ytr (array-like): Training labels.
+        Xv (array-like): Validation features.
+        yv (array-like): Validation labels.
+
+    Returns:
+        metrics (DataFrame): A DataFrame containing performance metrics for different Complement Naive Bayes models.
+    """
     # naive bayes complement
     cnb = ComplementNB(alpha=0,force_alpha=True)
     cnb.fit(Xtr,ytr)
@@ -212,6 +272,18 @@ def comp_nb_models(Xtr,ytr,Xv,yv):
     return pd.DataFrame(metrics)
 
 def multi_nb_models(Xtr,ytr,Xv,yv):
+    """
+    Trains and evaluates Multinomial Naive Bayes models with different parameter combinations and returns the performance metrics.
+
+    Parameters:
+        Xtr (array-like): Training features.
+        ytr (array-like): Training labels.
+        Xv (array-like): Validation features.
+        yv (array-like): Validation labels.
+
+    Returns:
+        metrics (DataFrame): A DataFrame containing performance metrics for different Multinomial Naive Bayes models.
+    """
     # naive bayes multinomial
     mnb = MultinomialNB(alpha=0)
     mnb.fit(Xtr,ytr)
@@ -245,6 +317,18 @@ def multi_nb_models(Xtr,ytr,Xv,yv):
     return pd.DataFrame(metrics)
 
 def cat_nb_models(Xtr,ytr,Xv,yv):
+    """
+    Trains and evaluates Categorical Naive Bayes models with different parameter combinations and returns the performance metrics.
+
+    Parameters:
+        Xtr (array-like): Training features.
+        ytr (array-like): Training labels.
+        Xv (array-like): Validation features.
+        yv (array-like): Validation labels.
+
+    Returns:
+        metrics (DataFrame): A DataFrame containing performance metrics for different Categorical Naive Bayes models.
+    """
     # naive bayes categorical
     cat = CategoricalNB(alpha=0,force_alpha=True)
     cat.fit(Xtr,ytr)
@@ -312,6 +396,19 @@ def select_kbest(X, y, k=2, scoring=chi2):
 
 
 def multi_nb_hyperparam_search(X_train, y_train, X_val, y_val, hyperparams):
+    """
+    Performs a hyperparameter search for Multinomial Naive Bayes models and returns the results.
+
+    Parameters:
+        X_train (array-like): Training features.
+        y_train (array-like): Training labels.
+        X_val (array-like): Validation features.
+        y_val (array-like): Validation labels.
+        hyperparams (list): List of dictionaries, where each dictionary contains a set of hyperparameters.
+
+    Returns:
+        df_results (DataFrame): A DataFrame containing the results of the hyperparameter search.
+    """
     results = []
     
     for params in hyperparams:
