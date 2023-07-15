@@ -60,33 +60,33 @@ This project aims to predict a company's response to a complaint made by a consu
 <details>
   <summary>Show more preparation details</summary>
 
-* **`<span color="red">`Dropped Columns**
+* **Dropped Columns**
   * **product**
     * 0% null
-    * *`<span color="orange">`ENGINEERED FEATURE*
-    * **`<span color="orange">`bin related products/services together then drop**
-      * `<span color="orange">`bins = credit_report, credit_card, debt_collection, mortgage, bank, loans, and money_service
+    * *ENGINEERED FEATURE*
+    * **bin related products/services together then drop**
+      * bins = credit_report, credit_card, debt_collection, mortgage, bank, loans, and money_service
   * **subproduct**
     * 7% null
   * **issue**
     * 0% nulls
     * 165 unique values
-    * **`<span color="blue">`Planned use in future iteration**
+    * **Planned use in future iteration**
   * **subissue**
     * 20% null
     * 221 unique
   * **consumer_complaint_narrative**
     * 64% null
     * renamed to narrative
-      * **`<span color="orange">`drop all null values**
-      * **`<span color="orange">`drop after NLTK cleaning**
+      * **drop all null values**
+      * **drop after NLTK cleaning**
   * **company_public_response**
     * 56% null
     * related to target
   * **zip_code**
     * 1% null
     * mixed data types
-      * **`<span color="blue">`Planned use in future iteration**
+      * **Planned use in future iteration**
   * **consumer_consent_provided**
     * 25% null
     * does not relate to the target
@@ -95,11 +95,11 @@ This project aims to predict a company's response to a complaint made by a consu
     * does not relate to the target
   * **date_sent_to_company**
     * 0% null
-      * **`<span color="blue">`Planned use in future iteration**
+      * **Planned use in future iteration**
   * **timely_response**
     * 0% null
     * boolean
-      * **`<span color="blue">`Planned use in future iteration**
+      * **Planned use in future iteration**
   * **consumer_disputed**
     * 77% null
   * **complaint_id**
@@ -107,7 +107,7 @@ This project aims to predict a company's response to a complaint made by a consu
 
 ---
 
-* **`<span color="green">`Cleaned Columns**
+* **Cleaned Columns**
   * **date_received**
     * 0% nulls
     * changed date to DateTime
@@ -118,17 +118,17 @@ This project aims to predict a company's response to a complaint made by a consu
   * **state**
     * 1% null
     * keep for purposes of exploration
-      * **`<span color="orange">`impute 1% null into UNKNOWN label**
+      * **impute 1% null into UNKNOWN label**
   * **tags**
     * 89% null
-      * **`<span color="orange">`impute nulls with "Average Person label**
+      * **impute nulls with "Average Person label**
   * **company_response_to_consumer**
     * Target
     * 4 nulls = 0%
-      * **`<span color="orange">`drop these 4 rows because this is the target column**
+      * **drop these 4 rows because this is the target column**
     * 8 initial unique values
-      * **`<span color="blue">`future: apply the model to in_progress complaints and see what it predicts based on the language**
-      * **`<span color="orange">`drop 'in progress' response because there is no conclusion**
+      * **future: apply the model to in_progress complaints and see what it predicts based on the language**
+      * **drop 'in progress' response because there is no conclusion**
 
 ---
 
