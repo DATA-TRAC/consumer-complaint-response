@@ -1,16 +1,16 @@
 # Company Response to Consumer Complaints
 
-[Project Description](#project-description)
-[Project Goal](#project-goal)
-[Initial Thoughts](#initial-thoughts)
-[The Plan](#the-plan)
-[Acquire & Prep](#acquire)
-[Explore](#explore)
-[Data Dictionary](#data-dictionary)
-[Modeling](#model)
-[Steps to Reproduce](#steps-to-reproduce)
-[Conclusion](#conclusion)
-[Meet the Team](#meet-the-team)
+[ [Project Description](#project-description) ]
+[ [Project Goal](#project-goal) ]
+[ [Initial Thoughts](#initial-thoughts) ]
+[ [The Plan](#the-plan) ]
+[ [Acquire & Prep](#acquire) ]
+[ [Explore](#explore) ]
+[ [Data Dictionary](#data-dictionary) ]
+[ [Modeling](#model) ]
+[ [Steps to Reproduce](#steps-to-reproduce) ]
+[ [Conclusion](#conclusion) ]
+[ [Meet the Team](#meet-the-team) ]
 
 ## Project Description
 
@@ -60,33 +60,33 @@ This project aims to predict a company's response to a complaint made by a consu
 <details>
   <summary>Show more preparation details</summary>
 
-* **`<span style="color:red">`Dropped Columns**
+* **`<span color="red">`Dropped Columns**
   * **product**
     * 0% null
-    * *`<span style="color:orange">`ENGINEERED FEATURE*
-    * **`<span style="color:orange">`bin related products/services together then drop**
-      * `<span style="color:orange">`bins = credit_report, credit_card, debt_collection, mortgage, bank, loans, and money_service
+    * *`<span color="orange">`ENGINEERED FEATURE*
+    * **`<span color="orange">`bin related products/services together then drop**
+      * `<span color="orange">`bins = credit_report, credit_card, debt_collection, mortgage, bank, loans, and money_service
   * **subproduct**
     * 7% null
   * **issue**
     * 0% nulls
     * 165 unique values
-    * **`<span style="color:blue">`Planned use in future iteration**
+    * **`<span color="blue">`Planned use in future iteration**
   * **subissue**
     * 20% null
     * 221 unique
   * **consumer_complaint_narrative**
     * 64% null
     * renamed to narrative
-      * **`<span style="color:orange">`drop all null values**
-      * **`<span style="color:orange">`drop after NLTK cleaning**
+      * **`<span color="orange">`drop all null values**
+      * **`<span color="orange">`drop after NLTK cleaning**
   * **company_public_response**
     * 56% null
     * related to target
   * **zip_code**
     * 1% null
     * mixed data types
-      * **`<span style="color:blue">`Planned use in future iteration**
+      * **`<span color="blue">`Planned use in future iteration**
   * **consumer_consent_provided**
     * 25% null
     * does not relate to the target
@@ -95,20 +95,19 @@ This project aims to predict a company's response to a complaint made by a consu
     * does not relate to the target
   * **date_sent_to_company**
     * 0% null
-      * **`<span style="color:blue">`Planned use in future iteration**
+      * **`<span color="blue">`Planned use in future iteration**
   * **timely_response**
     * 0% null
     * boolean
-      * **`<span style="color:blue">`Planned use in future iteration**
+      * **`<span color="blue">`Planned use in future iteration**
   * **consumer_disputed**
     * 77% null
   * **complaint_id**
     * 0% null
-      `<br>`
 
 ---
 
-* **`<span style="color:green">`Cleaned Columns**
+* **`<span color="green">`Cleaned Columns**
   * **date_received**
     * 0% nulls
     * changed date to DateTime
@@ -119,17 +118,17 @@ This project aims to predict a company's response to a complaint made by a consu
   * **state**
     * 1% null
     * keep for purposes of exploration
-      * **`<span style="color:orange">`impute 1% null into UNKNOWN label**
+      * **`<span color="orange">`impute 1% null into UNKNOWN label**
   * **tags**
     * 89% null
-      * **`<span style="color:orange">`impute nulls with "Average Person label**
+      * **`<span color="orange">`impute nulls with "Average Person label**
   * **company_response_to_consumer**
     * Target
     * 4 nulls = 0%
-      * **`<span style="color:orange">`drop these 4 rows because this is the target column**
+      * **`<span color="orange">`drop these 4 rows because this is the target column**
     * 8 initial unique values
-      * **`<span style="color:blue">`future: apply the model to in_progress complaints and see what it predicts based on the language**
-      * **`<span style="color:orange">`drop 'in progress' response because there is no conclusion**
+      * **`<span color="blue">`future: apply the model to in_progress complaints and see what it predicts based on the language**
+      * **`<span color="orange">`drop 'in progress' response because there is no conclusion**
 
 ---
 
@@ -289,7 +288,7 @@ Selected columns to explore with after cleaning:
 [Back to Top](#company-response-to-consumer-complaints)
 
 GitHubs:
-[Alexia Lewis](https://github.com/lewisalexia)
-[Rosendo Lugo](https://github.com/rosendo-lugo)
-[Chellyan Moreno](https://github.com/chellyan-moreno)
-[Tyler Kephart](https://github.com/tkephart96)
+[ [Alexia Lewis](https://github.com/lewisalexia) ]
+[ [Rosendo Lugo](https://github.com/rosendo-lugo) ]
+[ [Chellyann Moreno](https://github.com/chellyann-moreno) ]
+[ [Tyler Kephart](https://github.com/tkephart96) ]
