@@ -4,7 +4,7 @@
 [ [Project Goal](#project-goal) ]
 [ [Initial Thoughts](#initial-thoughts) ]
 [ [The Plan](#the-plan) ]
-[ [Acquire & Prep](#acquire) ]
+[ [Acquire &amp; Prep](#acquire) ]
 [ [Explore](#explore) ]
 [ [Data Dictionary](#data-dictionary) ]
 [ [Modeling](#model) ]
@@ -216,7 +216,7 @@ Selected columns to explore with after cleaning:
 | consumer_disputed                     | Whether the consumer disputed the company's response, discontinued as of April 24, 2017    |
 | complaint_id                          | Unique ID for complaints registered with the CFPB                                           |
 | product_bins                          | Engineered Feature: bin related products together                                           |
-| clean                                 | Engineered Feature: tokenized, numbers/specials, and XX's removed                           |
+| clean                                 | Engineered Feature: tokenized, removed numbers/specials and XX's from privacy sanitization  |
 | lemon                                 | Engineered Feature: removed stopwords, kept real words, and lemmatized the clean column    |
 
 ## Model
@@ -238,7 +238,7 @@ Selected columns to explore with after cleaning:
 1) Clone this repo
    * You may need to update your Python Libraries, our libraries were updated in June 2023
 2) For a relatively quick run *(possibly 10+ min, depends on system resources)*
-   * Verify `import wrangle as w` is in the imports section of final-report
+   * Verify `df = wrangle_complaints()` is in the cell after imports of final-report
    * Run final-report notebook
    * This will use a pre-built and cleaned dataset that would be produced from the longer steps below
      * Even after cleaning, the data amounts to just under 1GB
@@ -248,14 +248,14 @@ Selected columns to explore with after cleaning:
   <summary>3) For the longer run *(possibly 30+ min, depends on system resources)*</summary>
 
 * ⚠️WARNING⚠️: These are basically the same steps we took to originally acquire the data. The steps take a lot of time (and disk space) and may not even be the best way of doing it. We highly recommend doing the quick run in step 2 unless you want to know how we got the data and experience the long wait.
-* Verify `import big_wrangle as w` is in the imports section of final-report
+* Verify `df = wrangle_complaints_the_long_way()` is in the cell after imports of final-report
 * Install the pandas-gbq package through the terminal/command line
   * `pip install pandas-gbq`
 * Go to [Google BigQuery](https://console.cloud.google.com/marketplace/product/cfpb/complaint-database) and create a project
-  * Copy the 'SQL_query' variable found in `big_wrangle.py` and run in [Google BigQuery](console.cloud.google.com/bigquery?ws=!1m5!1m4!4m3!1sbigquery-public-data!2scfpb_complaints!3scomplaint_database)
+  * Copy the 'SQL_query' variable found in `wrangle.py` and run in [Google BigQuery](console.cloud.google.com/bigquery?ws=!1m5!1m4!4m3!1sbigquery-public-data!2scfpb_complaints!3scomplaint_database)
   * Save the result as a BigQuery table in your project
-    * You can look in `big_wrangle.py` for what we named the project, database, and table (we kept the database and table names the same as the original)
-  * Edit and save the 'SQL_query' variable found in `big_wrangle.py` to the respective table names in your BigQuery project using this format: `FROM database.table` and edit the 'project_ID' variable to your project's ID
+    * You can look in `wrangle.py` for what we named the project, database, and table (we kept the database and table names the same as the original)
+  * Edit and save the 'SQL_query' variable found in `wrangle.py` to the respective table names in your BigQuery project using this format: `FROM database.table` and edit the 'project_ID' variable to your project's ID
   * Create a [Service Account](https://console.cloud.google.com/iam-admin/serviceaccounts) and key for your project
     * Save the key as `service_key.json` into the local repo
 * Run final-report notebook and be patient
@@ -284,13 +284,12 @@ Selected columns to explore with after cleaning:
 
 ### Recommendations and Next Steps
 
-* **Enhance Response Analysis**: The project highlights the need to analyze company responses to consumer complaints. Consider investing in natural language processing (NLP) techniques to extract meaningful insights from response data. By understanding the patterns and sentiments in responses, you can identify areas for improvement and optimize customer interactions.
-* **Focus on Detailed Explanations**: The analysis suggests that providing detailed explanations in responses, especially for the "Closed with explanation" category, can positively impact customer satisfaction. Train your customer service representatives to provide comprehensive and clear explanations, addressing consumer concerns effectively.
-* **Monitor Sentiment and Product Categories**: Pay attention to sentiment analysis of consumer complaints across different product categories. Identify trends in sentiment and response types to understand customer expectations and tailor your response strategies accordingly. This can help you improve the overall customer experience and target specific pain points in different product categories.
-* **Predictive Response Modeling**: Explore the possibility of building predictive models to anticipate company responses based on complaint language. By leveraging machine learning algorithms, you can automate response categorization and improve response time and accuracy. This can enhance operational efficiency and streamline complaint resolution processes.
+* **Enhance Response Analysis**: The project highlights the need to analyze company responses to consumer complaints. Consider investing in natural language processing (NLP) techniques to extract meaningful insights from response data. By understanding the patterns and sentiments in responses, it might be possible to identify areas for improvement and optimize customer interactions.
+* **Monitor Sentiment and Product Categories**: Pay attention to sentiment analysis of consumer complaints across different product categories. Identify trends in sentiment and response types to understand customer expectations and tailor the response strategies accordingly. This can help to improve the overall customer experience and target specific pain points in different product categories.
 * **Address Discrimination and Bias**: Conduct further analysis on zip codes, states, and company responses to identify potential discrimination or bias in the complaint resolution process. Ensure fairness and equality by addressing any disparities and taking appropriate actions to eliminate discriminatory practices.
 * **Identify Industry Trends**: Look for industry-specific trends by analyzing complaints related to specific companies, such as Silicon Valley Bank and Bank of America. This analysis can help identify emerging issues, detect patterns of non-compliance, and proactively address potential risks.
-* **Continuous Improvement**: Treat the project as a starting point and continuously refine your complaint resolution processes. Regularly review customer feedback, complaints, and company responses to identify areas for improvement. Implement a feedback loop to integrate customer insights into your operations and drive continuous improvement initiatives.
+* **Continuous Improvement**: Treat the project as a starting point and continuously refine the complaint resolution processes. Regularly review customer feedback, complaints, and company responses to identify areas for improvement. Implement a feedback loop to integrate customer insights into operations and drive continuous improvement initiatives.
+
 <!-- 
 ### Next Steps
 

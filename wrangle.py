@@ -21,16 +21,13 @@ import pandas_gbq
 #splitting
 from sklearn.model_selection import train_test_split
 
-#vizzes
-import matplotlib.pyplot as plt
-import seaborn as sns
-
 #prepare imports
 import re
 import unicodedata
 import nltk
 from nltk.tokenize.toktok import ToktokTokenizer
 from nltk.corpus import stopwords
+from functools import partial
 
 #nltk sentiment
 from nltk.sentiment import SentimentIntensityAnalyzer
@@ -51,7 +48,11 @@ print('imports loaded successfully, awaiting commands...')
 '''
 
 #------------------------------------------------------------- ACQUIRE -------------------------------------------------------------
-    
+
+# edit the below variables to your respective project, database, and table names in Google BigQuery
+SQL_query = "select * from cfpb_complaints.complaint_database"
+project_id = "my-ds-projects"
+
 def check_file_exists_gbq(csv_fn, json_fn):
     '''
     check if file exists in my local directory, if not, pull from google big query db
@@ -156,8 +157,7 @@ def token_it_up(string):
     :return: a tokenized version of the input string.
     """
     tokenize = nltk.tokenize.ToktokTokenizer()
-    string = tokenize.tokenize(string, return_str=True)
-    return string
+    return tokenize.tokenize(string, return_str=True)
 
 def lemmad(string):
     """
@@ -170,9 +170,10 @@ def lemmad(string):
     WordNetLemmatizer from the NLTK library.
     """
     wnl = nltk.stem.WordNetLemmatizer()
-    string = [wnl.lemmatize(word) for word in string.split()]
-    string = ' '.join(string)
-    return string
+    return ' '.join([wnl.lemmatize(word) for word in string.split()])
+
+# speed things up by calling it once outside the function
+corpus_words = set(nltk.corpus.words.words())
 
 def remove_stopwords(string, extra_words=None, exclude_words=None):
     """
@@ -192,20 +193,36 @@ def remove_stopwords(string, extra_words=None, exclude_words=None):
         extra_words = []
     if exclude_words is None:
         exclude_words = []
-    sls = stopwords.words('english')
 
-    sls = set(sls) - set(exclude_words)
-    sls = sls.union(set(extra_words))
+    # sls = set(stopwords.words('english'))
+    # sls = set(sls) - set(exclude_words)
+    # sls = sls.union(set(extra_words))
+    sls = set(stopwords.words('english')) - set(exclude_words) | set(extra_words)
 
-    words = string.split()
-    filtered = [word for word in words if word not in sls]
-    string = ' '.join(filtered)
-    corpus_words = set(nltk.corpus.words.words())
+    # words = string.split()
+    # filtered = [word for word in string.split() if word not in sls]
+    string = ' '.join([word for word in string.split() if word not in sls])
+    # corpus_words = set(nltk.corpus.words.words())
     return " ".join(
         w
-        for w in nltk.tokenize.wordpunct_tokenize(words)
+        for w in nltk.tokenize.wordpunct_tokenize(string)
         if w.lower() in corpus_words or not w.isalpha()
     )
+
+def clean_narrative(narrative):
+    """
+    The function `clean_narrative` takes a narrative as input, removes special characters, numbers, and
+    apostrophes, performs basic cleaning, tokenizes the text, and returns the cleaned and tokenized
+    narrative as a string.
+    
+    :param narrative: The `narrative` parameter is a string that represents a piece of text or a story
+    :return: a cleaned and tokenized version of the input narrative.
+    """
+    # remove specials
+    sls = ["&#9;", "12", "'"]
+    cleaned = basic_clean(re.sub(r'[X{1,}\d\']', ' ', narrative))
+    tokenized = token_it_up(cleaned)
+    return ' '.join(word for word in tokenized.split() if word not in sls)
 
 def prep_narrative(df):
     """
@@ -219,16 +236,61 @@ def prep_narrative(df):
     :return: the prepped dataframe, which includes the original columns as well as the derived columns
     'clean' and 'lemon'.
     """
-    # remove specials
-    sls = ["&#9;", "12", "'"]
     # Derive column 'clean' from column: cleanup up 'readme_contents'
-    df = df.assign(clean = df.apply(lambda row : ' '.join([word for word in (token_it_up(basic_clean(re.sub(r'[X{1,}\d\']', ' ', string=row.narrative)))).split() if word not in sls]), axis=1))
-    # Derive column 'lemmatized' from column: lemmatized 'clean'
-    df = df.assign(lemon = df.apply(lambda row : lemmad(remove_stopwords(row.clean,sls)), axis=1))
+    df['clean'] = df['narrative'].apply(partial(clean_narrative))
     # Drop narrative column
     df = df.drop(columns={'narrative'})
+    # Derive column 'lemmatized' from column: lemmatized 'clean'
+    df['lemon'] = df['clean'].apply(partial(remove_stopwords))
+    df['lemon'] = df['lemon'].apply(partial(lemmad))
     # return prepped df
     return df
+
+def wrangle_complaints():
+    """
+    The function `wrangle_complaints` checks if a prepped cache file exists, and if not, downloads a
+    parquet file and caches it.
+    :return: The function `wrangle_complaints()` returns a pandas DataFrame.
+    """
+    # check if prepped cache exists
+    if os.path.isfile('cfpb_prep.parquet'):
+        print('parquet file found and loaded')
+        return pd.read_parquet('cfpb_prep.parquet')
+    elif os.path.isfile('df_prep.parquet'):
+        print('parquet file found and loaded')
+        return pd.read_parquet('df_prep.parquet')
+    else: 
+        # get prepped df and cache it
+        print('downloading file - this may take a few minutes...')
+        df = pd.read_parquet('https://github.com/DATA-TRAC/consumer-complaint-response/raw/main/cfpb_prep.parquet')
+        df.to_parquet('cfpb_prep.parquet')
+        return df
+
+def wrangle_complaints_the_long_way():
+    """
+    The function `wrangle_complaints` checks if a prepped cache file exists, and if not, it retrieves an
+    original dataframe, cleans the data, preps the narrative using nltk, exports the prepped dataframe
+    to a parquet file, and returns the prepped dataframe.
+    :return: a pandas DataFrame object.
+    """
+    # check if prepped cache exists
+    if os.path.isfile('cfpb_prep.parquet'):
+        print('parquet file found and loaded')
+        return pd.read_parquet('cfpb_prep.parquet')
+    elif os.path.isfile('df_prep.parquet'):
+        print('parquet file found and loaded')
+        return pd.read_parquet('df_prep.parquet')
+    else: 
+        # get original df
+        df = check_file_exists_gbq(csv_fn='cfpb.csv',json_fn='service_key.json')
+        # clean the data up
+        df = clean_data(df)
+        # nltk prep the data
+        df = prep_narrative(df)
+        # cache prep data
+        print('exporting parquet and returning df')
+        df.to_parquet('cfpb_prep.parquet')
+        return df
 
 #------------------------------------------------------------- NLTK -------------------------------------------------------------
 
@@ -238,7 +300,6 @@ def sentiment_analysis(df):
     '''
     # Initialize the sentiment intensity analyzer
     sia = SentimentIntensityAnalyzer()
-
     # Apply the sentiment intensity analyzer to the 'lemon' column
     df['sentiment'] = df['lemon'].apply(lambda complaint: sia.polarity_scores(complaint)['compound'] if isinstance(complaint, str) else None)
     return df
