@@ -274,13 +274,10 @@ Selected columns to explore with after cleaning:
 
 [Back to Top](#company-response-to-consumer-complaints)
 
-* There are no specific words associated with a particular type of response in company responses.
-* The most common words in company responses include account, credit, report, information, payment, loan, time, debt, company, and day.
-* The response type "Closed with explanation" has the highest word count among the top words, suggesting that companies provide more detailed explanations in their responses.
-* Companies tend to use fewer words in their responses when the response type is "Untimely response," possibly indicating less detailed explanations.
-* The sentiment of consumer complaints/narratives correlates with the corresponding responses from companies across different industry sectors.
-* Different product categories receive different types of responses based on the sentiment of the complaints/narratives.
-* The analysis of words used in complaints and company responses suggests that specific words can be associated with certain product categories and used to predict the type of response.
+* The analysis of words used in complaints against company responses suggests that specific words can be associated with certain product categories and used to predict the type of response
+* The most common words in consumer complaints include account, credit, report, information, payment, loan, time, debt, company, and day
+* The response "Closed with explanation" is the most likely outcome from a complaint, suggesting that companies provide detailed explanations in their responses rather than relief
+* Different product categories receive different types of responses based on the sentiment of the complaints/narratives
 
 ### Recommendations and Next Steps
 
