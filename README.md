@@ -301,10 +301,12 @@ Selected columns to explore after cleaning:
 
 [Back to Top](#company-response-to-consumer-complaints)
 
-* The analysis of words used in complaints against company responses suggests that specific words can be associated with certain product categories and used to predict the type of response
-* The most common words in consumer complaints include account, credit, report, information, payment, loan, time, debt, company, and day
-* The response "Closed with explanation" is the most likely outcome from a complaint, suggesting that companies provide detailed explanations in their responses rather than relief
-* Different product categories receive different types of responses based on the sentiment of the complaints/narratives
+* The analysis of words used in complaints against company responses suggests that specific words can be associated with certain product categories and used to predict the type of response.
+* The most common words in consumer complaints include account, credit, report, information, payment, loan, time, debt, company, and day.
+* The response "Closed with explanation" is the most likely outcome from a complaint, suggesting that companies provide detailed explanations in their responses rather than relief.
+* Different product categories receive different types of responses based on the sentiment of the complaints/narratives.
+* A Decision Tree Classifier with a max depth of 9 and minimum sample leaf of 11 performed best on the train, validate, and test data, but all models fell short of expectations.
+* Further exploration of feature combinations, n-gram types, and evaluation metrics is underway to enhance prediction accuracy.
 
 ### Recommendations and Next Steps
 
