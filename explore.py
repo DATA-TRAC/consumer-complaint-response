@@ -93,7 +93,7 @@ def get_words(train):
     money_words = basic_clean_split(' '.join(train[train.company_response_to_consumer == 'Closed with monetary relief'].lemon.astype(str)))
     timed_out_words = basic_clean_split(' '.join(train[train.company_response_to_consumer == 'Untimely response'].lemon.astype(str)))
     closed_words = basic_clean_split(' '.join(train[train.company_response_to_consumer == 'Closed'].lemon.astype(str)))
-    all_words = basic_clean_split(' '.join(train.lemon))
+    all_words = basic_clean_split(' '.join(train.lemon.astype(str)))
     
     #grabbing frequencies of occurrences
     explanation_freq = pd.Series(explanation_words).value_counts()
@@ -120,14 +120,14 @@ def get_words_products(train):
     returns a word_count df containing the associated words for each product
     '''
     #assigning all words to proper labels
-    credit_report_words = basic_clean_split(' '.join(train[train.product_bins == 'credit_report'].lemon))
-    debt_words = basic_clean_split(' '.join(train[train.product_bins == 'debt_collection'].lemon))
-    credit_card_words = basic_clean_split(' '.join(train[train.product_bins == 'credit_card'].lemon))
-    mortgage_words = basic_clean_split(' '.join(train[train.product_bins == 'mortgage'].lemon))
-    loans_words = basic_clean_split(' '.join(train[train.product_bins == 'loans'].lemon))
-    bank_words = basic_clean_split(' '.join(train[train.product_bins == 'bank'].lemon))
-    money_service_words = basic_clean_split(' '.join(train[train.product_bins == 'money_service'].lemon))
-    all_words = basic_clean_split(' '.join(train.lemon))
+    credit_report_words = basic_clean_split(' '.join(train[train.product_bins == 'credit_report'].lemon.astype(str)))
+    debt_words = basic_clean_split(' '.join(train[train.product_bins == 'debt_collection'].lemon.astype(str)))
+    credit_card_words = basic_clean_split(' '.join(train[train.product_bins == 'credit_card'].lemon.astype(str)))
+    mortgage_words = basic_clean_split(' '.join(train[train.product_bins == 'mortgage'].lemon.astype(str)))
+    loans_words = basic_clean_split(' '.join(train[train.product_bins == 'loans'].lemon.astype(str)))
+    bank_words = basic_clean_split(' '.join(train[train.product_bins == 'bank'].lemon.astype(str)))
+    money_service_words = basic_clean_split(' '.join(train[train.product_bins == 'money_service'].lemon.astype(str)))
+    all_words = basic_clean_split(' '.join(train.lemon.astype(str)))
     
     #grabbing frequencies of occurrences
     credit_report_freq = pd.Series(credit_report_words).value_counts()
