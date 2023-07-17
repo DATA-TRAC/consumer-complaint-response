@@ -163,7 +163,7 @@ def baseline(y_train):
     variable values for the training set
     :return: The percentage of the majority class in the y_train dataset, rounded to 4 decimal places.
     """
-    return f'{round(y_train.value_counts(normalize=True)[0],4)*100}%'
+    print(f'Baseline Accuracy: {round(y_train.value_counts(normalize=True)[0],4)*100}%')
 
 
 def process_data_modeling(train, validate, test):
