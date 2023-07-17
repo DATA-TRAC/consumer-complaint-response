@@ -179,10 +179,6 @@ def process_data_modeling(train, validate, test):
     read from a parquet file named 'test.parquet'
     :return: six variables: X_train, y_train, X_val, y_val, X_test, and y_test.
     """
-    train = pd.read_parquet('train.parquet')
-    validate = pd.read_parquet('validate.parquet')
-    test = pd.read_parquet('test.parquet')
-    
     response_categories = [
         'Closed with explanation',
         'Closed with non-monetary relief',
