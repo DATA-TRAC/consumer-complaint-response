@@ -98,6 +98,93 @@ def make_tfidf(Xtr,Xv,Xt):
 
 #------------------------------------------------------------- MODELING-------------------------------------------------------------
 
+
+
+
+def process_data_modeling():
+    train = pd.read_parquet('train.parquet')
+    validate = pd.read_parquet('validate.parquet')
+    test = pd.read_parquet('test.parquet')
+    
+    sm_train1 = int(round(len(train[train.company_response_to_consumer=='Closed with explanation'])*.2,0))
+    sm_train2 = int(round(len(train[train.company_response_to_consumer=='Closed with non-monetary relief'])*.2,0))
+    sm_train3 = int(round(len(train[train.company_response_to_consumer=='Closed with monetary relief'])*.2,0))
+    sm_train4 = int(round(len(train[train.company_response_to_consumer=='Untimely response'])*.2,0))
+    sm_train5 = int(round(len(train[train.company_response_to_consumer=='Closed'])*.2,0))
+    sm_val1 = int(round(len(validate[validate.company_response_to_consumer=='Closed with explanation'])*.2,0))
+    sm_val2 = int(round(len(validate[validate.company_response_to_consumer=='Closed with non-monetary relief'])*.2,0))
+    sm_val3 = int(round(len(validate[validate.company_response_to_consumer=='Closed with monetary relief'])*.2,0))
+    sm_val4 = int(round(len(validate[validate.company_response_to_consumer=='Untimely response'])*.2,0))
+    sm_val5 = int(round(len(validate[validate.company_response_to_consumer=='Closed'])*.2,0))
+    sm_test1 = int(round(len(test[test.company_response_to_consumer=='Closed with explanation'])*.2,0))
+    sm_test2 = int(round(len(test[test.company_response_to_consumer=='Closed with non-monetary relief'])*.2,0))
+    sm_test3 = int(round(len(test[test.company_response_to_consumer=='Closed with monetary relief'])*.2,0))
+    sm_test4 = int(round(len(test[test.company_response_to_consumer=='Untimely response'])*.2,0))
+    sm_test5 = int(round(len(test[test.company_response_to_consumer=='Closed'])*.2,0))
+    
+    small_train1 = train[train.company_response_to_consumer=='Closed with explanation'].sample(sm_train1, random_state=123)
+    small_train2 = train[train.company_response_to_consumer=='Closed with non-monetary relief'].sample(sm_train2, random_state=123)
+    small_train3 = train[train.company_response_to_consumer=='Closed with monetary relief'].sample(sm_train3, random_state=123)
+    small_train4 = train[train.company_response_to_consumer=='Untimely response'].sample(sm_train4, random_state=123)
+    small_train5 = train[train.company_response_to_consumer=='Closed'].sample(sm_train5, random_state=123)
+    small_val1 = validate[validate.company_response_to_consumer=='Closed with explanation'].sample(sm_val1, random_state=123)
+    small_val2 = validate[validate.company_response_to_consumer=='Closed with non-monetary relief'].sample(sm_val2, random_state=123)
+    small_val3 = validate[validate.company_response_to_consumer=='Closed with monetary relief'].sample(sm_val3, random_state=123)
+    small_val4 = validate[validate.company_response_to_consumer=='Untimely response'].sample(sm_val4, random_state=123)
+    small_val5 = validate[validate.company_response_to_consumer=='Closed'].sample(sm_val5, random_state=123)
+    small_test1 = test[test.company_response_to_consumer=='Closed with explanation'].sample(sm_test1, random_state=123)
+    small_test2 = test[test.company_response_to_consumer=='Closed with non-monetary relief'].sample(sm_test2, random_state=123)
+    small_test3 = test[test.company_response_to_consumer=='Closed with monetary relief'].sample(sm_test3, random_state=123)
+    small_test4 = test[test.company_response_to_consumer=='Untimely response'].sample(sm_test4, random_state=123)
+    small_test5 = test[test.company_response_to_consumer=='Closed'].sample(sm_test5, random_state=123)
+
+    small_train = pd.concat([small_train1, small_train2, small_train3, small_train4, small_train5])
+    small_val = pd.concat([small_val1, small_val2, small_val3, small_val4, small_val5])
+    small_test = pd.concat([small_test1, small_test2, small_test3, small_test4, small_test5])
+
+    X_train = m.encode(small_train)
+    X_train = X_train.drop(columns=['date_received','company_response_to_consumer','clean','state','company_name','tags','product_bins'])
+    y_train = small_train['company_response_to_consumer']
+    X_val = m.encode(small_val)
+    X_val = X_val.drop(columns=['date_received','company_response_to_consumer','clean','state','company_name','tags','product_bins'])
+    y_val = small_val['company_response_to_consumer']
+    X_test = m.encode(small_test)
+    X_test = X_test.drop(columns=['date_received','company_response_to_consumer','clean','state','company_name','tags','product_bins'])
+    y_test = small_test['company_response_to_consumer']
+
+    return X_train, y_train, X_val, y_val, X_test, y_test
+
+
+
+def process_vect_merge():
+    X_train_cv, X_val_cv, X_test_cv = make_cv(X_train[['lemon']], X_val[['lemon']], X_test[['lemon']])
+    X_train_tf, X_val_tf, X_test_tf = make_tfidf(X_train[['lemon']], X_val[['lemon']], X_test[['lemon']])
+    
+    encoded_train = X_train.iloc[:, 1:]
+    encoded_val = X_val.iloc[:, 1:]
+    encoded_test = X_test.iloc[:, 1:]
+    
+    X_train_cve = encoded_train.merge(X_train_cv, left_index=True, right_index=True)
+    X_val_cve = encoded_val.merge(X_val_cv, left_index=True, right_index=True)
+    X_test_cve = encoded_test.merge(X_test_cv, left_index=True, right_index=True)
+    
+    X_train_tfe = encoded_train.merge(X_train_tf, left_index=True, right_index=True)
+    X_val_tfe = encoded_val.merge(X_val_tf, left_index=True, right_index=True)
+    X_test_tfe = encoded_test.merge(X_test_tf, left_index=True, right_index=True)
+    
+    # Visualization of train data
+    return X_train_cve, X_train_tfe
+
+# Calling the function
+X_train_cve_head, X_train_tfe_head = process_data()
+print("X_train_cve_head:")
+print(X_train_cve_head)
+print("X_train_tfe_head:")
+print(X_train_tfe_head)
+
+
+
+
 def tree_models(Xtr,ytr,Xv,yv):
     """
     Trains and evaluates decision tree models with different parameter combinations and returns the performance metrics.
@@ -130,32 +217,20 @@ def tree_models(Xtr,ytr,Xv,yv):
         metrics.append(output)
     return pd.DataFrame(metrics)
 
-def forest_models(Xtr,ytr,Xv,yv):
-    """
-    Trains and evaluates random forest models with different parameter combinations and returns the performance metrics.
-
-    Parameters:
-        Xtr (array-like): Training features.
-        ytr (array-like): Training labels.
-        Xv (array-like): Validation features.
-        yv (array-like): Validation labels.
-
-    Returns:
-        metrics (DataFrame): A DataFrame containing performance metrics for different random forest models.
-    """
+def tree_models(Xtr,ytr,Xv,yv):
     metrics = []
-    # cycle through depth,leaf,class_weight for random forest
-    for d,l,cw in itertools.combinations(range(1,21),range(1,21),['balanced','balanced_subsample',None]):
-        # random forest
-        forest = RandomForestClassifier(max_depth=d, min_samples_leaf=l,class_weight=cw,random_state=123)
-        forest.fit(Xtr,ytr)
+    # cycle through depth,leaf,class_weight for dec tree
+    for d,l in itertools.product(range(5,11),range(5,11)):
+        # decision tree
+        tree = DecisionTreeClassifier(max_depth=d, min_samples_leaf=l,random_state=123)
+        tree.fit(Xtr,ytr)
         # accuracies
-        ytr_acc = forest.score(Xtr,ytr)
-        yv_acc = forest.score(Xv,yv)
+        ytr_acc = tree.score(Xtr,ytr)
+        yv_acc = tree.score(Xv,yv)
         # table-ize
         output ={
-                'model':'Random Forest',
-                'params':f"max_depth={d},min_samples_leaf={l},class_weight={cw},random_state=123",
+                'model':'Decision Tree',
+                'params':f"max_depth={d},min_samples_leaf={l},random_state=123",
                 'tr_acc':ytr_acc,
                 'v_acc':yv_acc,
             }
@@ -195,23 +270,11 @@ def knn_models(Xtr,ytr,Xv,yv):
     return pd.DataFrame(metrics)
 
 def log_models(Xtr,ytr,Xv,yv):
-    """
-    Trains and evaluates logistic regression models with different parameter combinations and returns the performance metrics.
-
-    Parameters:
-        Xtr (array-like): Training features.
-        ytr (array-like): Training labels.
-        Xv (array-like): Validation features.
-        yv (array-like): Validation labels.
-
-    Returns:
-        metrics (DataFrame): A DataFrame containing performance metrics for different logistic regression models.
-    """
     metrics = []
-    # cycle through C,class_weight for log reg
-    for c,cw in itertools.combinations([.01,.1,1,10,100,1000],['balanced',None]):
+    # cycle through C for log reg
+    for c in [.01,.1,1,10,100,1000]:
         # logistic regression
-        lr = LogisticRegression(C=c,class_weight=cw,random_state=123,max_iter=500)
+        lr = LogisticRegression(C=c,random_state=123,max_iter=500)
         lr.fit(Xtr,ytr)
         # accuracies
         ytr_acc = lr.score(Xtr,ytr)
@@ -219,12 +282,13 @@ def log_models(Xtr,ytr,Xv,yv):
         # table-ize
         output ={
                 'model':'LogReg',
-                'params':f"C={c},class_weight={cw},random_state=123,max_iter=500",
+                'params':f"C={c},random_state=123,max_iter=500",
                 'tr_acc':ytr_acc,
                 'v_acc':yv_acc,
             }
         metrics.append(output)
     return pd.DataFrame(metrics)
+ 
 
 def comp_nb_models(Xtr,ytr,Xv,yv):
     """
@@ -438,3 +502,23 @@ def multi_nb_hyperparam_search(X_train, y_train, X_val, y_val, hyperparams):
     plt.show()
     
     return df_results
+
+def forest_models(Xtr,ytr,Xv,yv):
+    metrics = []
+    # cycle through depth,leaf,class_weight for random forest
+    for d,l in itertools.product(range(5,11),range(5,11)):
+        # random forest
+        forest = RandomForestClassifier(max_depth=d, min_samples_leaf=l,random_state=123)
+        forest.fit(Xtr,ytr)
+        # accuracies
+        ytr_acc = forest.score(Xtr,ytr)
+        yv_acc = forest.score(Xv,yv)
+        # table-ize
+        output ={
+                'model':'Random Forest',
+                'params':f"max_depth={d},min_samples_leaf={l},random_state=123",
+                'tr_acc':ytr_acc,
+                'v_acc':yv_acc,
+            }
+        metrics.append(output)
+    return pd.DataFrame(metrics)
