@@ -235,11 +235,8 @@ Selected columns to explore after cleaning:
 ###  Classification Models:
 - Decision Tree
 - Random Forest
-- KNN
 - Logistic Regression
-- Multinomial NB
-- Complement NB
-- Categorical NB
+
 <details>
   <summary>Show more modeling details</summary>
  
