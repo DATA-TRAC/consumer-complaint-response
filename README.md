@@ -240,7 +240,9 @@ Selected columns to explore after cleaning:
 - Multinomial NB
 - Complement NB
 - Categorical NB
-
+<details>
+  <summary>Show more modeling details</summary>
+ 
 ### Evaluation Metric:
 - Accuracy
     * **Baseline: 78%</span>**
