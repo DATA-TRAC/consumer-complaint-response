@@ -88,11 +88,11 @@ def get_words(train):
     returns a word_count df containing the associated words for each response
     '''
     #assigning all words to proper labels
-    explanation_words = basic_clean_split(' '.join(train[train.company_response_to_consumer == 'Closed with explanation'].lemon))
-    no_money_words = basic_clean_split(' '.join(train[train.company_response_to_consumer == 'Closed with non-monetary relief'].lemon))
-    money_words = basic_clean_split(' '.join(train[train.company_response_to_consumer == 'Closed with monetary relief'].lemon))
-    timed_out_words = basic_clean_split(' '.join(train[train.company_response_to_consumer == 'Untimely response'].lemon))
-    closed_words = basic_clean_split(' '.join(train[train.company_response_to_consumer == 'Closed'].lemon))
+    explanation_words = basic_clean_split(' '.join(train[train.company_response_to_consumer == 'Closed with explanation'].lemon.astype(str)))
+    no_money_words = basic_clean_split(' '.join(train[train.company_response_to_consumer == 'Closed with non-monetary relief'].lemon.astype(str)))
+    money_words = basic_clean_split(' '.join(train[train.company_response_to_consumer == 'Closed with monetary relief'].lemon.astype(str)))
+    timed_out_words = basic_clean_split(' '.join(train[train.company_response_to_consumer == 'Untimely response'].lemon.astype(str)))
+    closed_words = basic_clean_split(' '.join(train[train.company_response_to_consumer == 'Closed'].lemon.astype(str)))
     all_words = basic_clean_split(' '.join(train.lemon))
     
     #grabbing frequencies of occurrences
@@ -193,13 +193,11 @@ def analyze_sentiment(train,alpha=0.05,truncate=False):
         print(f'p-value: {pvalue:.10f} > {alpha}?')
         print()
         print("Variance is true, proceed with ANOVA test...")
-        print()
     else:
         print("p-value:", pvalue)
         print()
         print("Variance is not true. Consider alternative tests for comparing groups.")
-        print()
-
+    print()
     # Get unique categories of product_bins
     unique_bins = sentiment_df['product_bins'].unique()
 
@@ -343,10 +341,10 @@ def get_word_counts(train):
     from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
     
     # Initialize a CountVectorizer (or TfidfVectorizer)
-    vectorizer = CountVectorizer(max_features=20000)
+    vectorizer = CountVectorizer(max_features=20000,lowercase=False)
 
     # Fit the vectorizer to the 'lemon' column and transform the column into a matrix
-    word_matrix = vectorizer.fit_transform(train['lemon'])
+    word_matrix = vectorizer.fit_transform(train['lemon'].astype(str))
 
     # Convert the sparse matrix to a DataFrame
     words_df = pd.DataFrame.sparse.from_spmatrix(word_matrix, columns=vectorizer.get_feature_names_out())
@@ -392,7 +390,7 @@ def top_15_words(word_counts_ones):
     # Set the index of the DataFrame to the responses
     top_words_df.index = responses
     return top_words_df
-def frequenct_words_plot(df_with_words,word_counts_ones):
+def frequent_words_plot(df_with_words,word_counts_ones):
     """
     Continuation of Q1
     Creates a bar plot to visualize the top 10 most frequently occurring words for each response type.
