@@ -250,6 +250,11 @@ Selected columns to explore after cleaning:
 ### Features Sent In:
 - Top 2,900 words in the 'lemon' column
 
+
+</details>
+
+---
+
 ## Steps to Reproduce
 
 [Back to Top](#company-response-to-consumer-complaints)
