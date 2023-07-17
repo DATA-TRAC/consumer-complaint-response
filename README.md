@@ -255,6 +255,12 @@ Selected columns to explore after cleaning:
 
 ---
 
+## Deliverables:
+
+* A  slide presentation summarizing findings in exploration and results of modeling.
+*[ Link](https://www.canva.com/design/DAFolc43Z1Y/eeld7BULceqtaXHpmf2mFA/edit?utm_content=DAFolc43Z1Y&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
+
+---
 ## Steps to Reproduce
 
 [Back to Top](#company-response-to-consumer-complaints)
