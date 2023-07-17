@@ -156,7 +156,7 @@ def analyze_sentiment(train,alpha=0.05,truncate=False):
     analysis relating to bank account products lead to a response of closed with monetary relief?"""
 
     # Running sentiment analysis and adding compound scores into the sentiment df. 
-    sentiment_df=w.sentiment_analysis(train)
+    sentiment_df=w.sentiment_analysis(train.copy())
     # Set the figure size
     plt.figure(figsize=(10, 6))
 
@@ -338,13 +338,13 @@ def get_word_counts(train):
         df_with_words (DataFrame): The original DataFrame merged with the word DataFrame.
         word_counts_ones (DataFrame): A filtered version of word_counts, excluding columns with all zero values.
     """
-    from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+    train_lemon = train['lemon']
     
     # Initialize a CountVectorizer (or TfidfVectorizer)
     vectorizer = CountVectorizer(max_features=20000,lowercase=False)
 
     # Fit the vectorizer to the 'lemon' column and transform the column into a matrix
-    word_matrix = vectorizer.fit_transform(train['lemon'].astype(str))
+    word_matrix = vectorizer.fit_transform(train_lemon.astype(str))
 
     # Convert the sparse matrix to a DataFrame
     words_df = pd.DataFrame.sparse.from_spmatrix(word_matrix, columns=vectorizer.get_feature_names_out())
