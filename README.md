@@ -35,6 +35,10 @@ This project aims to predict a company's response to a complaint made by a consu
 * There are going to be keywords that match a company's response.
 * Sentiment analysis will not be useful because most complaints will likely be negative.
 
+## Deliverables
+
+* [Here](https://www.canva.com/design/DAFolc43Z1Y/eeld7BULceqtaXHpmf2mFA/edit?utm_content=DAFolc43Z1Y&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton) is a slide presentation summarizing findings in exploration and results of modeling.
+
 ## The Plan
 
 [Back to Top](#company-response-to-consumer-complaints)
@@ -223,41 +227,34 @@ Selected columns to explore after cleaning:
 
 [Back to Top](#company-response-to-consumer-complaints)
 
-### Data Sample:
-- Calculated the sample size for each class category using a 20% sampling rate.
+### Data Sample
 
-- Created smaller datasets by sampling the specified number of samples from each class category.
+* Calculated the sample size for each class category using a 20% sampling rate.
 
-### Term Frequencies used:
-- Count Vectorizer
-- TF-IDF
+* Created smaller datasets by sampling the specified number of samples from each class category.
 
-###  Classification Models:
-- Decision Tree
-- Random Forest
-- Logistic Regression
+### Term Frequencies used
 
-<details>
-  <summary>Show more modeling details</summary>
- 
-### Evaluation Metric:
-- Accuracy
-    * **Baseline: 78%</span>**
+* Count Vectorizer
+* TF-IDF
 
-### Features Sent In:
-- Top 2,900 words in the 'lemon' column
+### Classification Models
 
+* Decision Tree
+* Random Forest
+* Logistic Regression
 
-</details>
+### Evaluation Metric
 
----
+* Accuracy
+  * **Baseline: 78.79%</span>**
 
-## Deliverables:
+### Features Sent In
 
-* A  slide presentation summarizing findings in exploration and results of modeling.
-*[ Link](https://www.canva.com/design/DAFolc43Z1Y/eeld7BULceqtaXHpmf2mFA/edit?utm_content=DAFolc43Z1Y&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
+* Top 2,900 words in the 'lemon' column
 
 ---
+
 ## Steps to Reproduce
 
 [Back to Top](#company-response-to-consumer-complaints)
