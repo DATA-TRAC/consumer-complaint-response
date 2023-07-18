@@ -220,8 +220,19 @@ Selected columns to explore after cleaning:
 | consumer_disputed                     | Whether the consumer disputed the company's response, discontinued as of April 24, 2017    |
 | complaint_id                          | Unique ID for complaints registered with the CFPB                                           |
 | product_bins                          | Engineered Feature: bin related products together                                           |
-| clean                                 | Engineered Feature: tokenized, removed numbers/specials and XXs from privacy sanitization  |
+| clean                                 | Engineered Feature: tokenized, removed numbers/specials and XXs from privacy sanitization   |
 | lemon                                 | Engineered Feature: removed stopwords, kept real words, and lemmatized the clean column    |
+
+#### Company Responses to Consumer
+
+Companies can categorize their response to a complaint in a number of ways.
+
+* **Closed with monetary relief**: The steps taken included objective, measurable, and verifiable monetary relief to the consumer as a direct result of the steps taken or that will be taken in response to the complaint.
+* **Closed with non-monetary relief**: The steps taken by the company in response to the complaint did not result in monetary relief, but may have addressed some or all of the consumer’s complaint involving non-monetary requests.
+* **Closed with explanation**: The steps taken by the company in response to the complaint included an explanation that was tailored to the individual consumer’s complaint. For example, this category would be used if the explanation substantively meets the consumer’s desired resolution or explains why no further action will be taken.
+* **Closed**: The company closed the complaint without relief – monetary or non-monetary – or explanation.
+* **In progress**: The company’s indication that the complaint could not be closed within 15 calendar days and that its final responsive explanation to the consumer will be provided through the portal at a later date
+* **Untimely Response**: The company is taking longer than 15 days to provide a response
 
 ## Model
 
@@ -230,7 +241,6 @@ Selected columns to explore after cleaning:
 ### Data Sample
 
 * Calculated the sample size for each class category using a 20% sampling rate.
-
 * Created smaller datasets by sampling the specified number of samples from each class category.
 
 ### Term Frequencies used
@@ -247,7 +257,7 @@ Selected columns to explore after cleaning:
 ### Evaluation Metric
 
 * Accuracy
-  * **Baseline: 78.79%</span>**
+  * **Baseline: 78.79%**
 
 ### Features Sent In
 
