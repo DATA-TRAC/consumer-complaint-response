@@ -98,7 +98,35 @@ def get_words(train):
     print(f"Total Unique Words Found per Response: {word_counts.shape[0]}")
     print()
     
-    return word_counts    
+    return word_counts
+
+
+def get_words2(train):
+    '''
+    this function extracts and counts words from a df based on different company responses.
+    returns a word_count df containing the associated words for each response
+    '''
+    #assigning all words to proper labels
+    relief_words = w.basic_clean(' '.join(train[train.response == 'relief'].lemon.astype(str)))
+    no_relief_words = w.basic_clean(' '.join(train[train.response == 'no_relief'].lemon.astype(str)))
+    all_words = w.basic_clean(' '.join(train.lemon.astype(str)))
+    
+    #grabbing frequencies of occurrences
+    relief_freq = pd.Series(relief_words).value_counts()
+    no_relief_freq = pd.Series(no_relief_words).value_counts()
+    all_freq = pd.Series(all_words).value_counts()
+
+    #combine into df to see all words and languages together
+    word_counts = (pd.concat([all_freq, relief_freq, no_relief_freq], axis=1, sort=True)
+                .set_axis(['all', 'relief', 'no_relief'], axis=1)
+                .fillna(0)
+                .apply(lambda s: s.astype(int)))
+    
+    print(f"Total Unique Words Found per Response: {word_counts.shape[0]}")
+    print()
+    
+    return word_counts
+
 
 def get_words_products(train):
     '''
@@ -135,6 +163,7 @@ def get_words_products(train):
     print()
     
     return word_counts_products
+
 
 def analyze_sentiment(train,alpha=0.05,truncate=False):
     """Analyzes sentiment and company response to consumer across product bins.
@@ -206,6 +235,79 @@ def analyze_sentiment(train,alpha=0.05,truncate=False):
             print("No significant effect of sentiment on company response to the consumer.")
 
         print()  # Print an empty line between each category's results
+
+
+def analyze_sentiment2(train,alpha=0.05,truncate=False):
+    """Analyzes sentiment and company response to consumer across product bins.
+    This function answers the question: Do narratives with a neutral or positive 
+    sentiment analysis relating to bank account products lead to relief from the company?"""
+
+    # Running sentiment analysis and adding compound scores into the sentiment df. 
+    sentiment_df = w.sentiment_analysis(train.copy())
+    # Set the figure size
+    plt.figure(figsize=(10, 6))
+
+    # Customize the plot style
+    sns.set(style="whitegrid")
+
+    # Create the bar plot
+    sns.barplot(data=sentiment_df, x='product_bins', y='sentiment', hue='response', ci=None, color='purple')
+
+    # Set the labels and title
+    plt.xlabel('Product Bins')
+    plt.ylabel('Sentiment')
+    plt.title('Company Response to Consumer and Sentiment Analysis across Product Bins')
+
+    # Adjust the legend position
+    plt.legend(loc='best')
+
+    # Show the plot
+    plt.show()
+
+    # Create example data for Levene test
+    group1 = np.random.normal(loc=10, scale=2, size=100)
+    group2 = np.random.normal(loc=12, scale=2, size=100)
+
+    # Calculate the theoretical means for each group
+    theoretical_mean_group1 = np.mean(group1)
+    theoretical_mean_group2 = np.mean(group2)
+
+    # Perform Levene test for variance comparison
+    tstat, pvalue = stats.levene(group1, group2)
+
+    print("Running Levene Test...")
+    if pvalue > alpha:
+        print(f'p-value: {pvalue:.10f} > {alpha}?')
+        print()
+        print("Variance is true, proceed with ANOVA test...")
+    else:
+        print("p-value:", pvalue)
+        print()
+        print("Variance is not true. Consider alternative tests for comparing groups.")
+    print()
+    # Get unique categories of product_bins
+    unique_bins = sentiment_df['product_bins'].unique()
+
+    # Perform ANOVA test for each category of product_bins
+    for bin_category in unique_bins:
+        # Create a subset of the data for the specific product_bins category
+        subset = sentiment_df[sentiment_df['product_bins'] == bin_category]
+
+        # Perform one-way ANOVA for the subset
+        result = stats.f_oneway(*[subset[subset['response'] == response]['sentiment']
+                                    for response in subset['response'].unique()])
+
+        # Print the ANOVA test result for the subset
+        print("Product Bins:", bin_category)
+        print("ANOVA p-value:", result.pvalue)
+
+        if result.pvalue < alpha:
+            print("Significant effect of sentiment on company response to the consumer.")
+        else:
+            print("No significant effect of sentiment on company response to the consumer.")
+
+        print()  # Print an empty line between each category's results
+
 
 def analyze_message_length(sentiment_df, alpha=0.05):
     """
@@ -310,10 +412,29 @@ def monetary_product(train):
                 xlabel='Proportion of Complaints for the Product', 
                 ylabel='Product Type');
 
-    
-def get_word_counts(train):
+
+def relief_product2(train):
     """
-    Question 1 - Lugo 
+    The function `relief_product2` creates a bar chart showing the proportions of relief for
+    different product types based on a given dataset.
+    
+    :param train: The `train` parameter is a DataFrame that contains the training data for the model. It
+    should have columns named 'product_bins' and 'response'. The 'product_bins'
+    column represents the different types of products, and the 'response' column
+    represents the response of the
+    """
+    # make crosstab of product and responses and normalize to get product proportions
+    cross = pd.crosstab(train['product_bins'],train['response'],normalize='index')
+    # plot relief products
+    cross['relief'].sort_values(
+        ).plot(kind='barh', 
+                title='Proportions of Relief', 
+                xlabel='Proportion of Complaints for the Product', 
+                ylabel='Product Type');
+
+
+def get_word_counts(train):
+    """ 
     Calculates the word counts for each response type in the given training data.
 
     Parameters:
@@ -347,10 +468,44 @@ def get_word_counts(train):
     return word_counts, df_with_words,word_counts_ones
 
 
+def get_word_counts2(train):
+    """
+    Calculates the word counts for each response type in the given training data.
+
+    Parameters:
+        train (DataFrame): The training data containing the 'lemon' and 'response' columns.
+
+    Returns:
+        word_counts (DataFrame): A DataFrame that shows the frequency of each word for each response type.
+        df_with_words (DataFrame): The original DataFrame merged with the word DataFrame.
+        word_counts_ones (DataFrame): A filtered version of word_counts, excluding columns with all zero values.
+    """
+    train_lemon = train['lemon']
+    
+    # Initialize a CountVectorizer
+    vectorizer = CountVectorizer(max_features=20000,lowercase=False)
+
+    # Fit the vectorizer to the 'lemon' column and transform the column into a matrix
+    word_matrix = vectorizer.fit_transform(train_lemon.astype(str))
+
+    # Convert the sparse matrix to a DataFrame
+    words_df = pd.DataFrame.sparse.from_spmatrix(word_matrix, columns=vectorizer.get_feature_names_out())
+
+    # merge the word DataFrame with the 'response' column
+    df_with_words = words_df.merge(train['response'], left_index=True, right_index=True)
+
+    # For each response type, count the frequency of each word
+    word_counts = df_with_words.groupby('response').sum()
+
+    # Filter out columns (axis=1) where all values are zero
+    word_counts_ones = word_counts.loc[:, word_counts.any(axis=0)]
+    
+    return word_counts, df_with_words, word_counts_ones
+
+
 def top_15_words(word_counts_ones):
     """
-    continuation of Q1
-    Retrieves the top 15 most frequently occurring words for each response type from the given word counts DataFrame.
+    Retrieves the top 15 words for each response type from the given word counts DataFrame.
 
     Parameters:
         word_counts_ones (DataFrame): The word counts DataFrame, filtered to exclude columns with all zero values.
@@ -366,7 +521,39 @@ def top_15_words(word_counts_ones):
 
     # Loop over the responses
     for response in responses:
-        # Get the 10 words that appear most frequently in narratives associated with the current response
+        # Get the 15 words that appear most frequently in narratives associated with the current response
+        top_words = word_counts_ones.loc[response].nlargest(15)
+
+        # Convert the Series to a DataFrame and transpose it
+        top_words_df_temp = pd.DataFrame(top_words).transpose()
+
+        # Append the temporary DataFrame to the main DataFrame
+        top_words_df = pd.concat([top_words_df, top_words_df_temp])
+
+    # Set the index of the DataFrame to the responses
+    top_words_df.index = responses
+    return top_words_df
+
+
+def top_15_words2(word_counts_ones):
+    """
+    Retrieves the top 15 words for each response type from the given word counts DataFrame.
+
+    Parameters:
+        word_counts_ones (DataFrame): The word counts DataFrame, filtered to exclude columns with all zero values.
+
+    Returns:
+        top_words_df (DataFrame): A DataFrame containing the top 15 words for each response type, indexed by the response types.
+    """
+    # Define the responses
+    responses = ['relief', 'no_relief']
+
+    # Initialize an empty DataFrame to store the results
+    top_words_df = pd.DataFrame()
+
+    # Loop over the responses
+    for response in responses:
+        # Get the 15 words that appear most frequently in narratives associated with the current response
         top_words = word_counts_ones.loc[response].nlargest(15)
 
         # Convert the Series to a DataFrame and transpose it
@@ -382,7 +569,6 @@ def top_15_words(word_counts_ones):
 
 def frequent_words_plot(df_with_words,word_counts_ones):
     """
-    Continuation of Q1
     Creates a bar plot to visualize the top 10 most frequently occurring words for each response type.
 
     Parameters:
@@ -394,6 +580,34 @@ def frequent_words_plot(df_with_words,word_counts_ones):
     """
     # Get the unique response types
     response_types = df_with_words['company_response_to_consumer'].unique()
+
+    # For each response type
+    for response in response_types:
+        # Get the top 10 words
+        top_words = word_counts_ones.loc[response].nlargest(10)
+
+        # Create a bar plot
+        plt.figure(figsize=(10, 5))
+        plt.bar(top_words.index, top_words.values)
+        plt.title(f'Top 10 words for "{response}" response')
+        plt.xlabel('Words')
+        plt.ylabel('Frequency')
+    return plt.show()
+
+
+def frequent_words_plot2(df_with_words,word_counts_ones):
+    """
+    Creates a bar plot to visualize the top 10 most frequently occurring words for each response type.
+
+    Parameters:
+        df_with_words (DataFrame): The DataFrame merged with the word DataFrame.
+        word_counts_ones (DataFrame): The filtered word counts DataFrame.
+
+    Returns:
+        None (displays the plot)
+    """
+    # Get the unique response types
+    response_types = df_with_words['response'].unique()
 
     # For each response type
     for response in response_types:
