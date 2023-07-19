@@ -153,6 +153,62 @@ def make_mbt_tfidf(Xtr,Xv,Xt):
     Xt_tfidf = pd.DataFrame(Xt_bow_tfidf.todense(),columns=tfidf.get_feature_names_out(),index=Xt.index)
     return Xtr_tfidf,Xv_tfidf,Xt_tfidf
 
+def make_mbt_tfidf2(Xtr,Xv,Xt):
+    """
+    The function `make_tfidf` takes in three sets of data (train, validation, and test) and applies the
+    TF-IDF vectorization technique to convert the text data into numerical features, using n-grams up to
+    trigrams and keeping single characters. It then returns the transformed data as pandas DataFrames.
+    
+    :param Xtr: Xtr is the training data, which is a dataframe containing the text data that you want to
+    transform into TF-IDF features. The "lemmatized" column in the dataframe contains the preprocessed
+    text data
+    :param Xv: Xv is the validation dataset, which is used to evaluate the performance of the model
+    during training
+    :param Xt: Xt is the input data for the test set. It is a dataframe containing the text data that
+    needs to be transformed into TF-IDF representation
+    :return: three dataframes: Xtr_tfidf, Xv_tfidf, and Xt_tfidf.
+    """
+    #make my bag of words up to trigrams tfidf and keep single characters
+    tfidf = TfidfVectorizer(token_pattern=r'(?u)\b\w+\b',lowercase=False, max_features=10000, ngram_range=(1,3))
+    # fit and transform train
+    Xtr_bow_tfidf = tfidf.fit_transform(Xtr.lemon.astype(str))
+    # transform val and test
+    Xv_bow_tfidf = tfidf.transform(Xv.lemon.astype(str))
+    Xt_bow_tfidf = tfidf.transform(Xt.lemon.astype(str))
+    # make dfs
+    Xtr_tfidf = pd.DataFrame(Xtr_bow_tfidf.todense(),columns=tfidf.get_feature_names_out(),index=Xtr.index)
+    Xv_tfidf = pd.DataFrame(Xv_bow_tfidf.todense(),columns=tfidf.get_feature_names_out(),index=Xv.index)
+    Xt_tfidf = pd.DataFrame(Xt_bow_tfidf.todense(),columns=tfidf.get_feature_names_out(),index=Xt.index)
+    return Xtr_tfidf,Xv_tfidf,Xt_tfidf
+
+def process_vector_merge(X_train,X_val,X_test):
+    X_train_tf, X_val_tf, X_test_tf = make_mbt_tfidf(X_train[['lemon']], X_val[['lemon']], X_test[['lemon']])
+    
+    encoded_train = X_train.iloc[:, 1:]
+    encoded_val = X_val.iloc[:, 1:]
+    encoded_test = X_test.iloc[:, 1:]
+    
+    X_train_tfe = encoded_train.merge(X_train_tf, left_index=True, right_index=True)
+    X_val_tfe = encoded_val.merge(X_val_tf, left_index=True, right_index=True)
+    X_test_tfe = encoded_test.merge(X_test_tf, left_index=True, right_index=True)
+    
+    # Visualization of train data
+    return X_train_tfe, X_val_tfe, X_test_tfe
+
+def process_vector_merge2(X_train,X_val,X_test):
+    X_train_tf, X_val_tf, X_test_tf = make_mbt_tfidf2(X_train[['lemon']], X_val[['lemon']], X_test[['lemon']])
+    
+    encoded_train = X_train.iloc[:, 1:]
+    encoded_val = X_val.iloc[:, 1:]
+    encoded_test = X_test.iloc[:, 1:]
+    
+    X_train_tfe = encoded_train.merge(X_train_tf, left_index=True, right_index=True)
+    X_val_tfe = encoded_val.merge(X_val_tf, left_index=True, right_index=True)
+    X_test_tfe = encoded_test.merge(X_test_tf, left_index=True, right_index=True)
+    
+    # Visualization of train data
+    return X_train_tfe, X_val_tfe, X_test_tfe
+
 #------------------------------------------------------------- MODELING-------------------------------------------------------------
 
 def baseline(y_train):
@@ -164,6 +220,14 @@ def baseline(y_train):
     :return: The percentage of the majority class in the y_train dataset, rounded to 4 decimal places.
     """
     print(f'Baseline Accuracy: {round(y_train.value_counts(normalize=True)[0],4)*100}%')
+
+
+def baseline2():
+    '''
+    gets the baseline for second iteration notebook
+    '''
+    baseline_accuracy = round(('no_relief' == df.response).mean(),4) * 100
+    print(f'Baseline Accuracy is {baseline_accuracy}%')
 
 
 def process_data_modeling(train, validate, test):
@@ -223,21 +287,60 @@ def process_data_modeling(train, validate, test):
 
     return X_train, y_train, X_val, y_val, X_test, y_test
 
+def process_data_modeling2(train, validate, test):
+    """
+    The function `process_data_modeling` reads data from parquet files, performs data sampling,
+    encoding, and splits the data into training, validation, and test sets.
+    
+    :param train: The `train` parameter is the training dataset, which is a pandas DataFrame containing
+    the data for training the model
+    :param validate: The `validate` parameter is a DataFrame that contains the validation data. It is
+    read from a parquet file named 'validate.parquet'
+    :param test: The `test` parameter is a DataFrame that contains the test data for your model. It is
+    read from a parquet file named 'test.parquet'
+    :return: six variables: X_train, y_train, X_val, y_val, X_test, and y_test.
+    """
+    random_state = 123
+    response_categories = [
+        'relief',
+        'no_relief'
+    ]
 
-def process_vector_merge(X_train,X_val,X_test):
-    X_train_cv, X_val_cv, X_test_cv = make_cv(X_train[['lemon']], X_val[['lemon']], X_test[['lemon']])
-    X_train_tf, X_val_tf, X_test_tf = make_mbt_tfidf(X_train[['lemon']], X_val[['lemon']], X_test[['lemon']])
-    
-    encoded_train = X_train.iloc[:, 1:]
-    encoded_val = X_val.iloc[:, 1:]
-    encoded_test = X_test.iloc[:, 1:]
-    
-    X_train_tfe = encoded_train.merge(X_train_tf, left_index=True, right_index=True)
-    X_val_tfe = encoded_val.merge(X_val_tf, left_index=True, right_index=True)
-    X_test_tfe = encoded_test.merge(X_test_tf, left_index=True, right_index=True)
-    
-    # Visualization of train data
-    return X_train_cv, X_val_cv, X_train_tfe, X_val_tfe, X_test_tfe
+    sm_train = []
+    sm_val = []
+    sm_test = []
+
+    small_train = pd.DataFrame()
+    small_val = pd.DataFrame()
+    small_test = pd.DataFrame()
+
+    random_state = 123
+    percent = .2
+
+    for category in response_categories:
+        sm_train.append(int(round(len(train[train.response == category]) * percent, 0)))
+        sm_val.append(int(round(len(validate[validate.response == category]) * percent, 0)))
+        sm_test.append(int(round(len(test[test.response == category]) * percent, 0)))
+        
+        small_train = small_train.append(train[train.response == category].sample(sm_train[-1], random_state=random_state))
+        small_val = small_val.append(validate[validate.response == category].sample(sm_val[-1], random_state=random_state))
+        small_test = small_test.append(test[test.response == category].sample(sm_test[-1], random_state=random_state))
+
+    small_train.reset_index(drop=True, inplace=True)
+    small_val.reset_index(drop=True, inplace=True)
+    small_test.reset_index(drop=True, inplace=True)
+
+    X_train = encode(small_train)
+    X_train = X_train.drop(columns=['date_received','clean','state','company_name','tags','product_bins', 'response'])
+    y_train = small_train['response']
+    X_val = encode(small_val)
+    X_val = X_val.drop(columns=['date_received','clean','state','company_name','tags','product_bins', 'response'])
+    y_val = small_val['response']
+    X_test = encode(small_test)
+    X_test = X_test.drop(columns=['date_received', 'clean','state','company_name','tags','product_bins', 'response'])
+    y_test = small_test['response']
+
+    return X_train, y_train, X_val, y_val, X_test, y_test
 
 
 def log_monogram_model(Xtr,ytr,Xv,yv):

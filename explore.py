@@ -68,32 +68,18 @@ def unique_words(word_counts):
     plt.tight_layout()  # Adjust the layout to avoid overlapping subplots
     plt.show()
 
-def basic_clean_split(string):
-    """
-    The function `basic_clean` takes a string as input and performs basic cleaning operations such as
-    converting the string to lowercase, removing non-alphanumeric characters, and normalizing unicode
-    characters.
-    
-    :param string: The parameter "string" is a string that you want to perform basic cleaning on
-    :return: The function `basic_clean` returns a cleaned version of the input string.
-    """
-    string = string.lower()
-    string = unicodedata.normalize('NFKD', string).encode('ascii','ignore').decode('utf-8')
-    string = re.sub(r'[^a-z0-9\'\s]', ' ', string).split()
-    return string
-
 def get_words(train):
     '''
     this function extracts and counts words from a df based on different company responses.
     returns a word_count df containing the associated words for each response
     '''
     #assigning all words to proper labels
-    explanation_words = basic_clean_split(' '.join(train[train.company_response_to_consumer == 'Closed with explanation'].lemon.astype(str)))
-    no_money_words = basic_clean_split(' '.join(train[train.company_response_to_consumer == 'Closed with non-monetary relief'].lemon.astype(str)))
-    money_words = basic_clean_split(' '.join(train[train.company_response_to_consumer == 'Closed with monetary relief'].lemon.astype(str)))
-    timed_out_words = basic_clean_split(' '.join(train[train.company_response_to_consumer == 'Untimely response'].lemon.astype(str)))
-    closed_words = basic_clean_split(' '.join(train[train.company_response_to_consumer == 'Closed'].lemon.astype(str)))
-    all_words = basic_clean_split(' '.join(train.lemon.astype(str)))
+    explanation_words = w.basic_clean(' '.join(train[train.company_response_to_consumer == 'Closed with explanation'].lemon.astype(str)))
+    no_money_words = w.basic_clean(' '.join(train[train.company_response_to_consumer == 'Closed with non-monetary relief'].lemon.astype(str)))
+    money_words = w.basic_clean(' '.join(train[train.company_response_to_consumer == 'Closed with monetary relief'].lemon.astype(str)))
+    timed_out_words = w.basic_clean(' '.join(train[train.company_response_to_consumer == 'Untimely response'].lemon.astype(str)))
+    closed_words = w.basic_clean(' '.join(train[train.company_response_to_consumer == 'Closed'].lemon.astype(str)))
+    all_words = w.basic_clean(' '.join(train.lemon.astype(str)))
     
     #grabbing frequencies of occurrences
     explanation_freq = pd.Series(explanation_words).value_counts()
@@ -120,14 +106,14 @@ def get_words_products(train):
     returns a word_count df containing the associated words for each product
     '''
     #assigning all words to proper labels
-    credit_report_words = basic_clean_split(' '.join(train[train.product_bins == 'credit_report'].lemon.astype(str)))
-    debt_words = basic_clean_split(' '.join(train[train.product_bins == 'debt_collection'].lemon.astype(str)))
-    credit_card_words = basic_clean_split(' '.join(train[train.product_bins == 'credit_card'].lemon.astype(str)))
-    mortgage_words = basic_clean_split(' '.join(train[train.product_bins == 'mortgage'].lemon.astype(str)))
-    loans_words = basic_clean_split(' '.join(train[train.product_bins == 'loans'].lemon.astype(str)))
-    bank_words = basic_clean_split(' '.join(train[train.product_bins == 'bank'].lemon.astype(str)))
-    money_service_words = basic_clean_split(' '.join(train[train.product_bins == 'money_service'].lemon.astype(str)))
-    all_words = basic_clean_split(' '.join(train.lemon.astype(str)))
+    credit_report_words = w.basic_clean(' '.join(train[train.product_bins == 'credit_report'].lemon.astype(str)))
+    debt_words = w.basic_clean(' '.join(train[train.product_bins == 'debt_collection'].lemon.astype(str)))
+    credit_card_words = w.basic_clean(' '.join(train[train.product_bins == 'credit_card'].lemon.astype(str)))
+    mortgage_words = w.basic_clean(' '.join(train[train.product_bins == 'mortgage'].lemon.astype(str)))
+    loans_words = w.basic_clean(' '.join(train[train.product_bins == 'loans'].lemon.astype(str)))
+    bank_words = w.basic_clean(' '.join(train[train.product_bins == 'bank'].lemon.astype(str)))
+    money_service_words = w.basic_clean(' '.join(train[train.product_bins == 'money_service'].lemon.astype(str)))
+    all_words = w.basic_clean(' '.join(train.lemon.astype(str)))
     
     #grabbing frequencies of occurrences
     credit_report_freq = pd.Series(credit_report_words).value_counts()
@@ -215,9 +201,9 @@ def analyze_sentiment(train,alpha=0.05,truncate=False):
         print("ANOVA p-value:", result.pvalue)
 
         if result.pvalue < alpha:
-            print("There is a significant effect of sentiment on company response to the consumer.")
+            print("Significant effect of sentiment on company response to the consumer.")
         else:
-            print("There is no significant effect of sentiment on company response to the consumer.")
+            print("No significant effect of sentiment on company response to the consumer.")
 
         print()  # Print an empty line between each category's results
 
@@ -247,9 +233,9 @@ def analyze_message_length(sentiment_df, alpha=0.05):
 
     print("ANOVA p-value:", p_value)
     if p_value < alpha:
-        print("The p-value is less than alpha. There is a significant relationship between message length and company response to the consumer.")
+        print("Significant relationship between message length and company response to the consumer.")
     else:
-        print("The p-value is greater than or equal to alpha. There is no significant relationship between message length and company response to the consumer.")  
+        print("No significant relationship between message length and company response to the consumer.")  
 
 def analyze_word_count(sentiment_df, alpha=0.05):
     """
@@ -277,9 +263,9 @@ def analyze_word_count(sentiment_df, alpha=0.05):
 
     print("ANOVA p-value:", p_value)
     if p_value < alpha:
-        print("The p-value is less than alpha. There is a significant relationship between message length and company response to the consumer.")
+        print("Significant relationship between message length and company response to the consumer.")
     else:
-        print("The p-value is greater than or equal to alpha. There is no significant relationship between message length and company response to the consumer.")
+        print("No significant relationship between message length and company response to the consumer.")
     # Create the scatter plot
     plt.scatter(sentiment_df['word_count'], sentiment_df['company_response_to_consumer'], cmap='Reds')
 
@@ -300,9 +286,9 @@ def analyze_word_count(sentiment_df, alpha=0.05):
 
     print("ANOVA p-value:", p_value)
     if p_value < alpha:
-        print("The p-value is less than alpha. There is a significant relationship between word count and company response to the consumer.")
+        print("Significant relationship between word count and company response to the consumer.")
     else:
-        print("The p-value is greater than or equal to alpha. There is no significant relationship between word count and company response to the consumer.")
+        print("No significant relationship between word count and company response to the consumer.")
 
 
 def monetary_product(train):
@@ -324,7 +310,7 @@ def monetary_product(train):
                 xlabel='Proportion of Complaints for the Product', 
                 ylabel='Product Type');
 
-
+    
 def get_word_counts(train):
     """
     Question 1 - Lugo 
@@ -359,6 +345,8 @@ def get_word_counts(train):
     word_counts_ones = word_counts.loc[:, word_counts.any(axis=0)]
     
     return word_counts, df_with_words,word_counts_ones
+
+
 def top_15_words(word_counts_ones):
     """
     continuation of Q1
@@ -390,6 +378,8 @@ def top_15_words(word_counts_ones):
     # Set the index of the DataFrame to the responses
     top_words_df.index = responses
     return top_words_df
+
+
 def frequent_words_plot(df_with_words,word_counts_ones):
     """
     Continuation of Q1

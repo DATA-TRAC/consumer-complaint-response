@@ -296,12 +296,21 @@ def wrangle_complaints_the_long_way():
         return df
 
 def prep_response(df):
+    '''
+    this function bins the company_response_to_consumer into relief and no_relief options for the second iteration
+    '''
+    #establish relief/no_relief variable
     relief = ['Closed with monetary relief', 'Closed with non-monetary relief']
     no_relief = ['Closed with explanation']
+    
+    #drop untimely response and closed
     df = df[df['company_response_to_consumer'] != "Untimely response"]
     df = df[df['company_response_to_consumer'] != "Closed"]
+    
+    #create new column using relief and no_relief options
     df['response'] = np.where(df['company_response_to_consumer'].isin(relief),'relief','')
     df['response'] = np.where(df['company_response_to_consumer'].isin(no_relief),'no_relief',df['response'])
+    
     return df.drop(columns='company_response_to_consumer')
 
 #------------------------------------------------------------- NLTK -------------------------------------------------------------
