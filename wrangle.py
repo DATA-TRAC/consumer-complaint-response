@@ -295,6 +295,15 @@ def wrangle_complaints_the_long_way():
         df.to_parquet('cfpb_prep.parquet')
         return df
 
+def prep_response(df):
+    relief = ['Closed with monetary relief', 'Closed with non-monetary relief']
+    no_relief = ['Closed with explanation']
+    df = df[df['company_response_to_consumer'] != "Untimely response"]
+    df = df[df['company_response_to_consumer'] != "Closed"]
+    df['response'] = np.where(df['company_response_to_consumer'].isin(relief),'relief','')
+    df['response'] = np.where(df['company_response_to_consumer'].isin(no_relief),'no_relief',df['response'])
+    return df.drop(columns='company_response_to_consumer')
+
 #------------------------------------------------------------- NLTK -------------------------------------------------------------
 
 def sentiment_analysis(df):
