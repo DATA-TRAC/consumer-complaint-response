@@ -240,8 +240,11 @@ def prep_narrative(df):
     df['clean'] = df['narrative'].apply(partial(clean_narrative))
     # Drop narrative column
     df = df.drop(columns={'narrative'})
-    # Derive column 'lemmatized' from column: lemmatized 'clean'
+    # Derive column 'lemmatized' from column: only real words, no stopwords 'clean'
     df['lemon'] = df['clean'].apply(partial(remove_stopwords))
+    # Drop clean column
+    df = df.drop(columns={'clean'})
+    # lemmatize lemon
     df['lemon'] = df['lemon'].apply(partial(lemmad))
     # return prepped df
     return df
@@ -262,7 +265,7 @@ def wrangle_complaints():
     else: 
         # get prepped df and cache it
         print('downloading file - this may take a few minutes...')
-        df = pd.read_parquet('https://github.com/DATA-TRAC/consumer-complaint-response/raw/main/cfpb_prep.parquet')
+        df = pd.read_parquet('https://github.com/DATA-TRAC-DATA/large-data/raw/main/cfpb_prep.parquet')
         df.to_parquet('cfpb_prep.parquet')
         return df
 
