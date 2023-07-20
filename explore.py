@@ -34,7 +34,100 @@ import wrangle as w
 *------------------*
 '''
 
-# -----------------------------------------------------------------EXPLORE-----------------------------------------------------------------
+# ----------------------------------------EXPLORE------------------------------------------------------
+# ---------------------------------------QUESTION 1----------------------------------------------------
+def get_word_counts(train):
+    """
+    Calculates the word counts for each response type in the given training data.
+
+    Parameters:
+        train (DataFrame): The training data containing the 'lemon' and 'response' columns.
+
+    Returns:
+        word_counts (DataFrame): A DataFrame that shows the frequency of each word for each response type.
+        df_with_words (DataFrame): The original DataFrame merged with the word DataFrame.
+        word_counts_ones (DataFrame): A filtered version of word_counts, excluding columns with all zero values.
+    """
+    train_lemon = train['lemon']
+    
+    # Initialize a CountVectorizer (or TfidfVectorizer)
+    vectorizer = CountVectorizer(max_features=20000,lowercase=False)
+
+    # Fit the vectorizer to the 'lemon' column and transform the column into a matrix
+    word_matrix = vectorizer.fit_transform(train_lemon.astype(str))
+
+    # Convert the sparse matrix to a DataFrame
+    words_df = pd.DataFrame.sparse.from_spmatrix(word_matrix, columns=vectorizer.get_feature_names_out())
+
+    # merge the word DataFrame with the 'response' column
+    df_with_words = words_df.merge(train['response'], left_index=True, right_index=True)
+
+    # For each response type, count the frequency of each word
+    word_counts = df_with_words.groupby('response_y').sum()
+
+    # Filter out columns (axis=1) where all values are zero
+    word_counts_ones = word_counts.loc[:, word_counts.any(axis=0)]
+    
+    return word_counts, df_with_words, word_counts_ones
+# ---------------------------------------------------------------------------------------------
+def top_15_words(word_counts_ones):
+    """
+    Retrieves the top 15 most frequently occurring words for each response type from the given word counts DataFrame.
+
+    Parameters:
+        word_counts_ones (DataFrame): The word counts DataFrame, filtered to exclude columns with all zero values.
+
+    Returns:
+        top_words_df (DataFrame): A DataFrame containing the top 15 words for each response type, indexed by the response types.
+    """
+    # Define the responses
+    responses = ['relief', 'no_relief']
+
+    # Initialize an empty DataFrame to store the results
+    top_words_df = pd.DataFrame()
+
+    # Loop over the responses
+    for response in responses:
+        # Get the 10 words that appear most frequently in narratives associated with the current response
+        top_words = word_counts_ones.loc[response].nlargest(15)
+
+        # Convert the Series to a DataFrame and transpose it
+        top_words_df_temp = pd.DataFrame(top_words).transpose()
+
+        # Append the temporary DataFrame to the main DataFrame
+        top_words_df = pd.concat([top_words_df, top_words_df_temp])
+
+    # Set the index of the DataFrame to the responses
+    top_words_df.index = responses
+    return top_words_df
+# ---------------------------------------------------------------------------------------------
+def frequent_words_plot(df_with_words, word_counts_ones):
+    """
+    Creates a bar plot to visualize the top 10 most frequently occurring words for each response type.
+
+    Parameters:
+        df_with_words (DataFrame): The DataFrame merged with the word DataFrame.
+        word_counts_ones (DataFrame): The filtered word counts DataFrame.
+
+    Returns:
+        None (displays the plot)
+    """
+    # Get the unique response types
+    response_types = df_with_words['response_y'].unique()
+
+    # For each response type
+    for response in response_types:
+        # Get the top 10 words
+        top_words = word_counts_ones.loc[response].nlargest(10)
+
+        # Create a bar plot
+        plt.figure(figsize=(10, 5))
+        plt.bar(top_words.index, top_words.values)
+        plt.title(f'Top 10 words for "{response}" response')
+        plt.xlabel('Words')
+        plt.ylabel('Frequency')
+    return plt.show()
+# --------------------------------END OF QUESTION 1--------------------------------------------
 
 def unique_words(word_counts):
     """
@@ -433,191 +526,191 @@ def relief_product2(train):
                 ylabel='Product Type');
 
 
-def get_word_counts(train):
-    """ 
-    Calculates the word counts for each response type in the given training data.
+# def get_word_counts(train):
+#     """ 
+#     Calculates the word counts for each response type in the given training data.
 
-    Parameters:
-        train (DataFrame): The training data containing the 'lemon' and 'company_response_to_consumer' columns.
+#     Parameters:
+#         train (DataFrame): The training data containing the 'lemon' and 'company_response_to_consumer' columns.
 
-    Returns:
-        word_counts (DataFrame): A DataFrame that shows the frequency of each word for each response type.
-        df_with_words (DataFrame): The original DataFrame merged with the word DataFrame.
-        word_counts_ones (DataFrame): A filtered version of word_counts, excluding columns with all zero values.
-    """
-    train_lemon = train['lemon']
+#     Returns:
+#         word_counts (DataFrame): A DataFrame that shows the frequency of each word for each response type.
+#         df_with_words (DataFrame): The original DataFrame merged with the word DataFrame.
+#         word_counts_ones (DataFrame): A filtered version of word_counts, excluding columns with all zero values.
+#     """
+#     train_lemon = train['lemon']
     
-    # Initialize a CountVectorizer (or TfidfVectorizer)
-    vectorizer = CountVectorizer(max_features=20000,lowercase=False)
+#     # Initialize a CountVectorizer (or TfidfVectorizer)
+#     vectorizer = CountVectorizer(max_features=20000,lowercase=False)
 
-    # Fit the vectorizer to the 'lemon' column and transform the column into a matrix
-    word_matrix = vectorizer.fit_transform(train_lemon.astype(str))
+#     # Fit the vectorizer to the 'lemon' column and transform the column into a matrix
+#     word_matrix = vectorizer.fit_transform(train_lemon.astype(str))
 
-    # Convert the sparse matrix to a DataFrame
-    words_df = pd.DataFrame.sparse.from_spmatrix(word_matrix, columns=vectorizer.get_feature_names_out())
+#     # Convert the sparse matrix to a DataFrame
+#     words_df = pd.DataFrame.sparse.from_spmatrix(word_matrix, columns=vectorizer.get_feature_names_out())
 
-    # merge the word DataFrame with the 'company_response_to_consumer' column
-    df_with_words = words_df.merge(train['company_response_to_consumer'], left_index=True, right_index=True)
+#     # merge the word DataFrame with the 'company_response_to_consumer' column
+#     df_with_words = words_df.merge(train['company_response_to_consumer'], left_index=True, right_index=True)
 
-    # For each response type, count the frequency of each word
-    word_counts = df_with_words.groupby('company_response_to_consumer').sum()
+#     # For each response type, count the frequency of each word
+#     word_counts = df_with_words.groupby('company_response_to_consumer').sum()
 
-    # Filter out columns (axis=1) where all values are zero
-    word_counts_ones = word_counts.loc[:, word_counts.any(axis=0)]
+#     # Filter out columns (axis=1) where all values are zero
+#     word_counts_ones = word_counts.loc[:, word_counts.any(axis=0)]
     
-    return word_counts, df_with_words,word_counts_ones
+#     return word_counts, df_with_words,word_counts_ones
 
 
-def get_word_counts2(train):
-    """
-    Calculates the word counts for each response type in the given training data.
+# def get_word_counts2(train):
+#     """
+#     Calculates the word counts for each response type in the given training data.
 
-    Parameters:
-        train (DataFrame): The training data containing the 'lemon' and 'response' columns.
+#     Parameters:
+#         train (DataFrame): The training data containing the 'lemon' and 'response' columns.
 
-    Returns:
-        word_counts (DataFrame): A DataFrame that shows the frequency of each word for each response type.
-        df_with_words (DataFrame): The original DataFrame merged with the word DataFrame.
-        word_counts_ones (DataFrame): A filtered version of word_counts, excluding columns with all zero values.
-    """
-    train_lemon = train['lemon']
+#     Returns:
+#         word_counts (DataFrame): A DataFrame that shows the frequency of each word for each response type.
+#         df_with_words (DataFrame): The original DataFrame merged with the word DataFrame.
+#         word_counts_ones (DataFrame): A filtered version of word_counts, excluding columns with all zero values.
+#     """
+#     train_lemon = train['lemon']
     
-    # Initialize a CountVectorizer
-    vectorizer = CountVectorizer(max_features=20000,lowercase=False)
+#     # Initialize a CountVectorizer
+#     vectorizer = CountVectorizer(max_features=20000,lowercase=False)
 
-    # Fit the vectorizer to the 'lemon' column and transform the column into a matrix
-    word_matrix = vectorizer.fit_transform(train_lemon.astype(str))
+#     # Fit the vectorizer to the 'lemon' column and transform the column into a matrix
+#     word_matrix = vectorizer.fit_transform(train_lemon.astype(str))
 
-    # Convert the sparse matrix to a DataFrame
-    words_df = pd.DataFrame.sparse.from_spmatrix(word_matrix, columns=vectorizer.get_feature_names_out())
+#     # Convert the sparse matrix to a DataFrame
+#     words_df = pd.DataFrame.sparse.from_spmatrix(word_matrix, columns=vectorizer.get_feature_names_out())
 
-    # merge the word DataFrame with the 'response' column
-    df_with_words = words_df.merge(train['response'], left_index=True, right_index=True)
+#     # merge the word DataFrame with the 'response' column
+#     df_with_words = words_df.merge(train['response'], left_index=True, right_index=True)
 
-    # For each response type, count the frequency of each word
-    word_counts = df_with_words.groupby('response').sum()
+#     # For each response type, count the frequency of each word
+#     word_counts = df_with_words.groupby('response').sum()
 
-    # Filter out columns (axis=1) where all values are zero
-    word_counts_ones = word_counts.loc[:, word_counts.any(axis=0)]
+#     # Filter out columns (axis=1) where all values are zero
+#     word_counts_ones = word_counts.loc[:, word_counts.any(axis=0)]
     
-    return word_counts, df_with_words, word_counts_ones
+#     return word_counts, df_with_words, word_counts_ones
 
 
-def top_15_words(word_counts_ones):
-    """
-    Retrieves the top 15 words for each response type from the given word counts DataFrame.
+# def top_15_words(word_counts_ones):
+#     """
+#     Retrieves the top 15 words for each response type from the given word counts DataFrame.
 
-    Parameters:
-        word_counts_ones (DataFrame): The word counts DataFrame, filtered to exclude columns with all zero values.
+#     Parameters:
+#         word_counts_ones (DataFrame): The word counts DataFrame, filtered to exclude columns with all zero values.
 
-    Returns:
-        top_words_df (DataFrame): A DataFrame containing the top 15 words for each response type, indexed by the response types.
-    """
-    # Define the responses
-    responses = ['Closed with explanation', 'Closed', 'Closed with monetary relief', 'Closed with non-monetary relief', 'Untimely response']
+#     Returns:
+#         top_words_df (DataFrame): A DataFrame containing the top 15 words for each response type, indexed by the response types.
+#     """
+#     # Define the responses
+#     responses = ['Closed with explanation', 'Closed', 'Closed with monetary relief', 'Closed with non-monetary relief', 'Untimely response']
 
-    # Initialize an empty DataFrame to store the results
-    top_words_df = pd.DataFrame()
+#     # Initialize an empty DataFrame to store the results
+#     top_words_df = pd.DataFrame()
 
-    # Loop over the responses
-    for response in responses:
-        # Get the 15 words that appear most frequently in narratives associated with the current response
-        top_words = word_counts_ones.loc[response].nlargest(15)
+#     # Loop over the responses
+#     for response in responses:
+#         # Get the 15 words that appear most frequently in narratives associated with the current response
+#         top_words = word_counts_ones.loc[response].nlargest(15)
 
-        # Convert the Series to a DataFrame and transpose it
-        top_words_df_temp = pd.DataFrame(top_words).transpose()
+#         # Convert the Series to a DataFrame and transpose it
+#         top_words_df_temp = pd.DataFrame(top_words).transpose()
 
-        # Append the temporary DataFrame to the main DataFrame
-        top_words_df = pd.concat([top_words_df, top_words_df_temp])
+#         # Append the temporary DataFrame to the main DataFrame
+#         top_words_df = pd.concat([top_words_df, top_words_df_temp])
 
-    # Set the index of the DataFrame to the responses
-    top_words_df.index = responses
-    return top_words_df
-
-
-def top_15_words2(word_counts_ones):
-    """
-    Retrieves the top 15 words for each response type from the given word counts DataFrame.
-
-    Parameters:
-        word_counts_ones (DataFrame): The word counts DataFrame, filtered to exclude columns with all zero values.
-
-    Returns:
-        top_words_df (DataFrame): A DataFrame containing the top 15 words for each response type, indexed by the response types.
-    """
-    # Define the responses
-    responses = ['relief', 'no_relief']
-
-    # Initialize an empty DataFrame to store the results
-    top_words_df = pd.DataFrame()
-
-    # Loop over the responses
-    for response in responses:
-        # Get the 15 words that appear most frequently in narratives associated with the current response
-        top_words = word_counts_ones.loc[response].nlargest(15)
-
-        # Convert the Series to a DataFrame and transpose it
-        top_words_df_temp = pd.DataFrame(top_words).transpose()
-
-        # Append the temporary DataFrame to the main DataFrame
-        top_words_df = pd.concat([top_words_df, top_words_df_temp])
-
-    # Set the index of the DataFrame to the responses
-    top_words_df.index = responses
-    return top_words_df
+#     # Set the index of the DataFrame to the responses
+#     top_words_df.index = responses
+#     return top_words_df
 
 
-def frequent_words_plot(df_with_words,word_counts_ones):
-    """
-    Creates a bar plot to visualize the top 10 most frequently occurring words for each response type.
+# def top_15_words2(word_counts_ones):
+#     """
+#     Retrieves the top 15 words for each response type from the given word counts DataFrame.
 
-    Parameters:
-        df_with_words (DataFrame): The DataFrame merged with the word DataFrame.
-        word_counts_ones (DataFrame): The filtered word counts DataFrame.
+#     Parameters:
+#         word_counts_ones (DataFrame): The word counts DataFrame, filtered to exclude columns with all zero values.
 
-    Returns:
-        None (displays the plot)
-    """
-    # Get the unique response types
-    response_types = df_with_words['company_response_to_consumer'].unique()
+#     Returns:
+#         top_words_df (DataFrame): A DataFrame containing the top 15 words for each response type, indexed by the response types.
+#     """
+#     # Define the responses
+#     responses = ['relief', 'no_relief']
 
-    # For each response type
-    for response in response_types:
-        # Get the top 10 words
-        top_words = word_counts_ones.loc[response].nlargest(10)
+#     # Initialize an empty DataFrame to store the results
+#     top_words_df = pd.DataFrame()
 
-        # Create a bar plot
-        plt.figure(figsize=(10, 5))
-        plt.bar(top_words.index, top_words.values)
-        plt.title(f'Top 10 words for "{response}" response')
-        plt.xlabel('Words')
-        plt.ylabel('Frequency')
-    return plt.show()
+#     # Loop over the responses
+#     for response in responses:
+#         # Get the 15 words that appear most frequently in narratives associated with the current response
+#         top_words = word_counts_ones.loc[response].nlargest(15)
+
+#         # Convert the Series to a DataFrame and transpose it
+#         top_words_df_temp = pd.DataFrame(top_words).transpose()
+
+#         # Append the temporary DataFrame to the main DataFrame
+#         top_words_df = pd.concat([top_words_df, top_words_df_temp])
+
+#     # Set the index of the DataFrame to the responses
+#     top_words_df.index = responses
+#     return top_words_df
 
 
-def frequent_words_plot2(df_with_words,word_counts_ones):
-    """
-    Creates a bar plot to visualize the top 10 most frequently occurring words for each response type.
+# def frequent_words_plot(df_with_words,word_counts_ones):
+#     """
+#     Creates a bar plot to visualize the top 10 most frequently occurring words for each response type.
 
-    Parameters:
-        df_with_words (DataFrame): The DataFrame merged with the word DataFrame.
-        word_counts_ones (DataFrame): The filtered word counts DataFrame.
+#     Parameters:
+#         df_with_words (DataFrame): The DataFrame merged with the word DataFrame.
+#         word_counts_ones (DataFrame): The filtered word counts DataFrame.
 
-    Returns:
-        None (displays the plot)
-    """
-    # Get the unique response types
-    response_types = df_with_words['response'].unique()
+#     Returns:
+#         None (displays the plot)
+#     """
+#     # Get the unique response types
+#     response_types = df_with_words['company_response_to_consumer'].unique()
 
-    # For each response type
-    for response in response_types:
-        # Get the top 10 words
-        top_words = word_counts_ones.loc[response].nlargest(10)
+#     # For each response type
+#     for response in response_types:
+#         # Get the top 10 words
+#         top_words = word_counts_ones.loc[response].nlargest(10)
 
-        # Create a bar plot
-        plt.figure(figsize=(10, 5))
-        plt.bar(top_words.index, top_words.values)
-        plt.title(f'Top 10 words for "{response}" response')
-        plt.xlabel('Words')
-        plt.ylabel('Frequency')
-    return plt.show()
+#         # Create a bar plot
+#         plt.figure(figsize=(10, 5))
+#         plt.bar(top_words.index, top_words.values)
+#         plt.title(f'Top 10 words for "{response}" response')
+#         plt.xlabel('Words')
+#         plt.ylabel('Frequency')
+#     return plt.show()
+
+
+# def frequent_words_plot2(df_with_words,word_counts_ones):
+#     """
+#     Creates a bar plot to visualize the top 10 most frequently occurring words for each response type.
+
+#     Parameters:
+#         df_with_words (DataFrame): The DataFrame merged with the word DataFrame.
+#         word_counts_ones (DataFrame): The filtered word counts DataFrame.
+
+#     Returns:
+#         None (displays the plot)
+#     """
+#     # Get the unique response types
+#     response_types = df_with_words['response'].unique()
+
+#     # For each response type
+#     for response in response_types:
+#         # Get the top 10 words
+#         top_words = word_counts_ones.loc[response].nlargest(10)
+
+#         # Create a bar plot
+#         plt.figure(figsize=(10, 5))
+#         plt.bar(top_words.index, top_words.values)
+#         plt.title(f'Top 10 words for "{response}" response')
+#         plt.xlabel('Words')
+#         plt.ylabel('Frequency')
+#     return plt.show()
