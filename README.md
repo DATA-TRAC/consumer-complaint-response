@@ -58,6 +58,7 @@ This project aims to predict a company's response to a complaint made by a consu
 * Create engineered columns from existing data
   * Bin products
   * Process narrative into clean and lemon
+  * Bin company responses
 * Encode categorical columns
 * Split data (60/20/20)
 
@@ -87,6 +88,10 @@ This project aims to predict a company's response to a complaint made by a consu
   * **company_public_response**
     * 56% null
     * related to target
+    * Bin into:
+      - Relief: Monetary Relief  Response and Non Monetary Relief Response
+      - No Relief: Closed with Explanation
+    * Dropped: Untimely Response and Closed
   * **zip_code**
     * 1% null
     * mixed data types
@@ -159,17 +164,14 @@ Selected columns to explore after cleaning:
 [Back to Top](#company-response-to-consumer-complaints)
 
 **1. Are there words that get particular responses and is there a relationship?**
-
-* What are the payout words that got a company response of closed with monetary relief?
-* Are there unique words associated with products? Is there a relationship between unique product words and responses?
+* What are the payout words that got relief from the company?
 
 **2. Do all responses have a negative sentiment?**
+* Do narratives with a neutral or positive sentiment analysis relating to bank account products lead to relief from the company?
 
-* Do narratives with a neutral or positive sentiment analysis relating to bank account products lead to a response of closed with monetary relief?
+**3. Are there unique words associated with no relief from the company?**
 
-**3. Are there unique words associated with the most negative and most positive company responses?**
-
-**4. Which product is more likely to have monetary relief?**
+**4. Which product is more likely to have relief?**
 
 <!-- 
 ---
@@ -232,7 +234,9 @@ Companies can categorize their response to a complaint in a number of ways.
 * **Closed with explanation**: The steps taken by the company in response to the complaint included an explanation that was tailored to the individual consumer’s complaint. For example, this category would be used if the explanation substantively meets the consumer’s desired resolution or explains why no further action will be taken.
 * **Closed**: The company closed the complaint without relief – monetary or non-monetary – or explanation.
 * **In progress**: The company’s indication that the complaint could not be closed within 15 calendar days and that its final responsive explanation to the consumer will be provided through the portal at a later date
-* **Untimely Response**: The company is taking longer than 15 days to provide a response
+* **Untimely Response**: The company is taking longer than 15 days to provide a response.
+
+We've binned our company responses into two categorical variables: relief and "no_relief"
 
 ## Model
 
@@ -245,8 +249,7 @@ Companies can categorize their response to a complaint in a number of ways.
 
 ### Term Frequencies used
 
-* Count Vectorizer
-* TF-IDF
+* TF-IDF w/ monograms,bigrams and trigrams
 
 ### Classification Models
 
@@ -255,14 +258,15 @@ Companies can categorize their response to a complaint in a number of ways.
 * Logistic Regression
 
 ### Evaluation Metric
-
+* Recall
 * Accuracy
   * **Baseline: 78.79%**
 
 ### Features Sent In
-
-* Top 2,900 words in the 'lemon' column
-
+- Top 2,900 words in 'lemon' column
+- Encoded features
+    - tags
+    - product_bins
 ---
 
 ## Steps to Reproduce
@@ -308,15 +312,13 @@ Companies can categorize their response to a complaint in a number of ways.
 
 [Back to Top](#company-response-to-consumer-complaints)
 
-* The analysis of words used in complaints against company responses suggests that specific words can be associated with certain product categories and used to predict the type of response.
-* The most common words in consumer complaints include account, credit, report, information, payment, loan, time, debt, company, and day.
-* The response "Closed with explanation" is the most likely outcome from a complaint, suggesting that companies provide detailed explanations in their responses rather than relief.
-* Different product categories receive different types of responses based on the sentiment of the complaints/narratives.
-* A Decision Tree Classifier with a max depth of 9 and minimum sample leaf of 11 performed best on the train, validate, and test data, but all models fell short of expectations.
-* Further exploration of feature combinations, n-gram types, and evaluation metrics is underway to enhance prediction accuracy.
+* The analysis explored relationships between complaint words and responses, as well as the sentiment's influence on response types. However, no significant correlations were found between specific words and responses, and sentiment did not consistently impact the response type.
+* Unique words associated with each product category were identified, offering insights for response prediction. Certain product categories had higher chances of receiving relief responses, while others had lower probabilities.
+* Various machine learning models were evaluated, with the Linear Support Vector Classification model performing well with a validation accuracy of 79.46% and recall of 99.23%. However, all models fell short of expectations, prompting further exploration of feature combinations and n-gram types for enhanced prediction accuracy.
 
 ### Recommendations and Next Steps
 
+## Recommendations & Next Steps
 * **Enhance Response Analysis**: The project highlights the need to analyze company responses to consumer complaints. Consider investing in natural language processing (NLP) techniques to extract meaningful insights from response data. By understanding the patterns and sentiments in responses, it might be possible to identify areas for improvement and optimize customer interactions.
 * **Monitor Sentiment and Product Categories**: Pay attention to sentiment analysis of consumer complaints across different product categories. Identify trends in sentiment and response types to understand customer expectations and tailor the response strategies accordingly. This can help to improve the overall customer experience and target specific pain points in different product categories.
 * **Address Discrimination and Bias**: Conduct further analysis on zip codes, states, and company responses to identify potential discrimination or bias in the complaint resolution process. Ensure fairness and equality by addressing any disparities and taking appropriate actions to eliminate discriminatory practices.
