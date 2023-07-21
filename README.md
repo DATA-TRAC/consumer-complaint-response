@@ -327,9 +327,8 @@ Companies can categorize their response to a complaint in a number of ways.
    
 - We decided to run the SVC model on the ***test*** data, and it gave us an ***accuracy*** score of ***79.43%*** and ***recall*** score of ***99.22%***
 
-### Recommendations and Next Steps
+## Recommendations and Next Steps
 
-## Recommendations & Next Steps
 * **Enhance Response Analysis**: The project highlights the need to analyze company responses to consumer complaints. Consider investing in natural language processing (NLP) techniques to extract meaningful insights from response data. By understanding the patterns and sentiments in responses, it might be possible to identify areas for improvement and optimize customer interactions.
 * **Monitor Sentiment and Product Categories**: Pay attention to sentiment analysis of consumer complaints across different product categories. Identify trends in sentiment and response types to understand customer expectations and tailor the response strategies accordingly. This can help to improve the overall customer experience and target specific pain points in different product categories.
 * **Address Discrimination and Bias**: Conduct further analysis on zip codes, states, and company responses to identify potential discrimination or bias in the complaint resolution process. Ensure fairness and equality by addressing any disparities and taking appropriate actions to eliminate discriminatory practices.
