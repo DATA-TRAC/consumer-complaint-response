@@ -89,8 +89,8 @@ This project aims to predict a company's response to a complaint made by a consu
     * 56% null
     * related to target
     * Bin into:
-      - Relief: Monetary Relief  Response and Non Monetary Relief Response
-      - No Relief: Closed with Explanation
+      * Relief: Monetary Relief  Response and Non Monetary Relief Response
+      * No Relief: Closed with Explanation
     * Dropped: Untimely Response and Closed
   * **zip_code**
     * 1% null
@@ -164,9 +164,11 @@ Selected columns to explore after cleaning:
 [Back to Top](#company-response-to-consumer-complaints)
 
 **1. Are there words that get particular responses and is there a relationship?**
+
 * What are the payout words that got relief from the company?
 
 **2. Do all responses have a negative sentiment?**
+
 * Do narratives with a neutral or positive sentiment analysis relating to bank account products lead to relief from the company?
 
 **3. Are there unique words associated with no relief from the company?**
@@ -246,8 +248,8 @@ Companies can categorize their response to a complaint in a number of ways.
 ### Data Sample
 
 * Calculated the sample size for each class category using a 20% sampling rate.
-    * not worried about the veracity of the data.
-    
+  * not worried about the veracity of the data.
+
 * Created smaller datasets by sampling the specified number of samples from each class category.
 
 ### Term Frequencies used
@@ -261,16 +263,18 @@ Companies can categorize their response to a complaint in a number of ways.
 * Linear Support Vector Classification
 
 ### Evaluation Metric
+
 * Recall
 * Accuracy
   * **Baseline: 79.31%**
 
 ### Features Sent In
-- Top 2,900 words in 'lemon' column
-- Encoded features
-    - tags
-    - product_bins
-    
+
+* Top 2,900 words in 'lemon' column
+* Encoded features
+  * tags
+  * product_bins
+
 ---
 
 ## Steps to Reproduce
@@ -318,14 +322,14 @@ Companies can categorize their response to a complaint in a number of ways.
 
 * The analysis explored relationships between complaint words and responses, as well as the sentiment's influence on response types. However, no significant correlations were found between specific words and responses, and sentiment did not consistently impact the response type.
 * Unique words associated with each product category were identified, offering insights for response prediction. Certain product categories had higher chances of receiving relief responses, while others had lower.
-* - We believe the ***Linear Support Vector Classification*** is a good median. The ***validate accuracy*** score was ***79.46%*** and ***recall*** score was ***99.23%***
-    - *Hyperparameters:* C set 0.1 and dual set to False
+* We believe the ***Linear Support Vector Classification*** is a good median. The ***validate accuracy*** score was ***79.46%*** and ***recall*** score was ***99.23%***
+  * *Hyperparameters:* C set 0.1 and dual set to False
 
 * With more time we would experiment with different features, types of n_grams combinations, and metrics to improve our model's prediction performance in different areas
 
-### Test with SVC: 
-   
-- We decided to run the SVC model on the ***test*** data, and it gave us an ***accuracy*** score of ***79.43%*** and ***recall*** score of ***99.22%***
+### Test with SVC
+
+* We decided to run the SVC model on the ***test*** data, and it gave us an ***accuracy*** score of ***79.43%*** and ***recall*** score of ***99.22%***
 
 ## Recommendations and Next Steps
 
