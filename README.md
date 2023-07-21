@@ -37,7 +37,7 @@ This project aims to predict a company's response to a complaint made by a consu
 
 ## Deliverables
 
-* [Here](https://www.canva.com/design/DAFolc43Z1Y/eeld7BULceqtaXHpmf2mFA/edit?utm_content=DAFolc43Z1Y&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton) is a slide presentation summarizing findings in exploration and results of modeling.
+* [Here](https://www.canva.com/design/DAFolc43Z1Y/4iLyGsfzYXfE1xoJ4usgFg/view?utm_content=DAFolc43Z1Y&utm_campaign=designshare&utm_medium=link&utm_source=publishsharelink) is a slide presentation summarizing findings in exploration and results of modeling.
 
 ## The Plan
 
