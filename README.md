@@ -16,13 +16,13 @@
 
 [Back to Top](#company-response-to-consumer-complaints)
 
-The Consumer Financial Protection Bureau (CFPB) has a Consumer Complaint Database that is a collection of complaints about consumer financial products and services that they sent to companies for a response. Complaints are published after the company responds, confirming a commercial relationship with the consumer, or after 15 days, whichever comes first. Complaints referred to other regulators, such as complaints about depository institutions with less than $10 billion in assets, are not published in the Consumer Complaint Database.
+The Consumer Financial Protection Bureau (CFPB) has a consumer complaint database that is a collection of complaints about consumer financial products and services that they sent to companies for a response. Complaints are published after the company responds, confirming a commercial relationship with the consumer, or after 15 days, whichever comes first. Complaints referred to other regulators, such as complaints about depository institutions with less than $10 billion in assets, are not published in the consumer complaint database.
 
 This database is not a statistical sample of consumers’ experiences in the marketplace. Complaints are not necessarily representative of all consumers’ experiences and complaints do not constitute “information” for purposes of the Information Quality Act.
 
 Complaint volume should be considered in the context of company size and/or market share. For example, companies with more customers may have more complaints than companies with fewer customers. CFPB encourages users to pair complaint data with public and private datasets for additional context.
 
-The Bureau publishes the consumer’s narrative description of his or her experience if the consumer opts to share it publicly and after the Bureau removes personal information. CFPB doesn’t verify all the allegations in complaint narratives. Unproven allegations in consumer narratives should be regarded as opinions, not facts. CFPB does not adopt the views expressed and makes no representation that the consumers’ allegations are accurate, clear, complete, or unbiased in substance or presentation. Users should consider what conclusions may be fairly drawn from complaints alone.
+The Bureau removes PII and publishes the consumer’s narrative of their experience **if** the consumer opts to share it publicly. CFPB doesn’t verify all the allegations in complaint narratives. Unproven allegations in consumer narratives should be regarded as opinions, not facts. CFPB does not adopt the views expressed and makes no representation that the consumers’ allegations are accurate, clear, complete, or unbiased in substance or presentation. Users should consider what conclusions may be fairly drawn from complaints alone.
 
 ## Project Goal
 
@@ -33,7 +33,7 @@ This project aims to predict a company's response to a complaint made by a consu
 ### Initial Thoughts
 
 * There are going to be keywords that match a company's response.
-* Sentiment analysis will not be useful because most complaints will likely be negative.
+* Sentiment analysis will **not** be useful because most complaints will likely be negative.
 
 ## Deliverables
 
@@ -145,7 +145,7 @@ This project aims to predict a company's response to a complaint made by a consu
 
 [Back to Top](#company-response-to-consumer-complaints)
 
-1,246,736 rows x 8 columns
+1,238,536 rows x 7 columns
 
 Used NLTK to clean each document resulting in:
 
@@ -153,7 +153,7 @@ Used NLTK to clean each document resulting in:
 
 Selected columns to explore after cleaning:
 
-* date_received, product_bins, company_name, state, tags, company_response_to_customer (target), clean, lemon
+* date_received, product_bins, company_name, state, tags, response, lemon
 
 </details>
 
@@ -219,11 +219,12 @@ Selected columns to explore after cleaning:
 | date_sent_to_company                  | The date the CFPB sent the complaint to the company                                         |
 | company_response_to_consumer (target) | The response from the company about this complaint                                          |
 | timely_response                       | Indicates whether the company gave a timely response or not                                 |
-| consumer_disputed                     | Whether the consumer disputed the company's response, discontinued as of April 24, 2017    |
+| consumer_disputed                     | Whether the consumer disputed the company's response, discontinued as of April 24, 2017     |
 | complaint_id                          | Unique ID for complaints registered with the CFPB                                           |
 | product_bins                          | Engineered Feature: bin related products together                                           |
 | clean                                 | Engineered Feature: tokenized, removed numbers/specials and XXs from privacy sanitization   |
-| lemon                                 | Engineered Feature: removed stopwords, kept real words, and lemmatized the clean column    |
+| lemon                                 | Engineered Feature: removed stopwords, kept real words, and lemmatized the clean column     |
+| response                              | Engineered Feature: binned company_response_to_consumer                                     |
 
 #### Company Responses to Consumer
 
@@ -236,7 +237,7 @@ Companies can categorize their response to a complaint in a number of ways.
 * **In progress**: The company’s indication that the complaint could not be closed within 15 calendar days and that its final responsive explanation to the consumer will be provided through the portal at a later date
 * **Untimely Response**: The company is taking longer than 15 days to provide a response.
 
-We've binned our company responses into two categorical variables: relief and "no_relief"
+### We've binned our company responses into two categorical variables: relief and no relief
 
 ## Model
 
@@ -245,6 +246,8 @@ We've binned our company responses into two categorical variables: relief and "n
 ### Data Sample
 
 * Calculated the sample size for each class category using a 20% sampling rate.
+    * not worried about the veracity of the data.
+    
 * Created smaller datasets by sampling the specified number of samples from each class category.
 
 ### Term Frequencies used
@@ -254,19 +257,20 @@ We've binned our company responses into two categorical variables: relief and "n
 ### Classification Models
 
 * Decision Tree
-* Random Forest
-* Logistic Regression
+* Multi-Layer Perceptron
+* Linear Support Vector Classification
 
 ### Evaluation Metric
 * Recall
 * Accuracy
-  * **Baseline: 78.79%**
+  * **Baseline: 79.31%**
 
 ### Features Sent In
 - Top 2,900 words in 'lemon' column
 - Encoded features
     - tags
     - product_bins
+    
 ---
 
 ## Steps to Reproduce
@@ -313,8 +317,15 @@ We've binned our company responses into two categorical variables: relief and "n
 [Back to Top](#company-response-to-consumer-complaints)
 
 * The analysis explored relationships between complaint words and responses, as well as the sentiment's influence on response types. However, no significant correlations were found between specific words and responses, and sentiment did not consistently impact the response type.
-* Unique words associated with each product category were identified, offering insights for response prediction. Certain product categories had higher chances of receiving relief responses, while others had lower probabilities.
-* Various machine learning models were evaluated, with the Linear Support Vector Classification model performing well with a validation accuracy of 79.46% and recall of 99.23%. However, all models fell short of expectations, prompting further exploration of feature combinations and n-gram types for enhanced prediction accuracy.
+* Unique words associated with each product category were identified, offering insights for response prediction. Certain product categories had higher chances of receiving relief responses, while others had lower.
+* - We believe the ***Linear Support Vector Classification*** is a good median. The ***validate accuracy*** score was ***79.46%*** and ***recall*** score was ***99.23%***
+    - *Hyperparameters:* C set 0.1 and dual set to False
+
+* With more time we would experiment with different features, types of n_grams combinations, and metrics to improve our model's prediction performance in different areas
+
+### Test with SVC: 
+   
+- We decided to run the SVC model on the ***test*** data, and it gave us an ***accuracy*** score of ***79.43%*** and ***recall*** score of ***99.22%***
 
 ### Recommendations and Next Steps
 
@@ -324,6 +335,8 @@ We've binned our company responses into two categorical variables: relief and "n
 * **Address Discrimination and Bias**: Conduct further analysis on zip codes, states, and company responses to identify potential discrimination or bias in the complaint resolution process. Ensure fairness and equality by addressing any disparities and taking appropriate actions to eliminate discriminatory practices.
 * **Identify Industry Trends**: Look for industry-specific trends by analyzing complaints related to specific companies, such as Silicon Valley Bank and Bank of America. This analysis can help identify emerging issues, detect patterns of non-compliance, and proactively address potential risks.
 * **Continuous Improvement**: Treat the project as a starting point and continuously refine the complaint resolution processes. Regularly review customer feedback, complaints, and company responses to identify areas for improvement. Implement a feedback loop to integrate customer insights into operations and drive continuous improvement initiatives.
+
+</div>
 
 <!-- 
 ### Next Steps
