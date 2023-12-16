@@ -224,7 +224,7 @@ def frequent_words_plot2(df_with_words, word_counts_ones):
 def unique_words(word_counts, rows, cols):
     """
     The function `unique_words` takes a DataFrame `word_counts` as input and creates a subplot of
-    horizontal bar plots, each showing the top 3 words with the highest count for a specific column in
+    horizontal bar plots, each showing the top 5 words with the highest count for a specific column in
     the DataFrame.
     
     :param word_counts: The parameter `word_counts` is expected to be a DataFrame containing word counts
